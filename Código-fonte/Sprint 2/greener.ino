@@ -84,8 +84,10 @@ void loop() {
   // Se umidade estiver fora do desejado, mostra mensagem de alerta apropriada por três segundos
   if (humidityIssueExists) {
     if (humidity < 65) {
-      displayMessage("Umidade baixa", "Fechar janelas");
-    }
+      displayMessage("Umidade baixa");
+    } else if (humidity > 95) {
+      displayMessage("Umidade alta");
+	}
     delay(3000);
   }
 }
