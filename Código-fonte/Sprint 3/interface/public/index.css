@@ -1,0 +1,19 @@
+#header {
+    margin-bottom: 4vh;
+}
+
+#status {
+    margin-bottom: 10vh;
+}
+
+.greenhouse-card {
+    margin-bottom: 3%;
+    margin-right: 2%;
+    margin-left: 0;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+    /* no underline */
+}
