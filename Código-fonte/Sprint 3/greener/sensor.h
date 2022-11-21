@@ -1,38 +1,36 @@
-/* Este módulo controla o sensor de temperatura AHT10 para o código-fonte do sistema em IoT Greener */
+#include <Wire.h>            // Biblioteca para I2C
+#include <Arduino.h>         // Biblioteca para utilizar Serial e delay
+#include <Adafruit_AHTX0.h>  // Biblioteca para utilizar sensor AHT10
 
-// Importa bibliotecas necessárias
-#include <Adafruit_AHTX0.h> // Biblioteca padrão do sensor
-#include <Wire.h> // Biblioteca para I2C
+Adafruit_AHTX0 aht;  // Inicializa objeto para o sensor
 
-// Define pinos de I2C do sistema
-#define SDA_PIN 4
-#define SLC_PIN 5
+// Define pinos I2C
+#define SDA 5
+#define SCL 4
 
-// Cria objeto de sensor
-Adafruit_AHTX0 aht;
-
-// Inicializa sensor
-int startSensor() {
-  Wire.begin(SDA_PIN, SLC_PIN); // Configura pinos de I2C do sistema
-  // Checa se sensor foi localizado no circuito. Caso não, envia erro.
-  if (!aht.begin()) {
-    Serial.println("Sensor não encontrado"); 
-	// Esta é uma medida provisória para demarcar o erro. Nas próximas sprints, pretendemos isto por um erro de fato visível ao usuário
-	// final no LCD, através do redirecionamento de exceções e integração de bibliotecas
+// Esta função inicializa o sensor e retorna verdadeiro se ele for localizado com sucesso; falso caso contrário
+int setupSensor() {
+  Wire.begin(SDA, SCL);  // Inicia comunicação I2C
+  Serial.begin(115200);  // Define velocidade da comunicação serial com monitor segundo o padrão do ESP-32
+  if (!aht.begin()) { // Tenta localizar sensor. Se não conseguir, exibe mensagem de erro no monitor e retorna 0.
+    Serial.println("Sensor não encontrado");
+    return 0;
   }
-  Serial.print("found seensor");
-}
-
-// Retorna temperatura medida pelo sensor
-float getTemp() {
-  sensors_event_t humidity, temp; // Cria objetos de temperatura e umidade
-  aht.getEvent(&humidity, &temp);  // Atualiza valor das medições
-  return temp.temperature; // Retorna valor da temperatura
+  // Se conseguir, exibe mensagem de sucesso e retorna 1
+  Serial.println("Sensor encontrado");
+  return 1;
 }
 
 // Retorna umidade medida pelo sensor
 float getHumidity() {
-  sensors_event_t humidity, temp; // Cria objetos de temperatura e umidade
-  aht.getEvent(&humidity, &temp); // Atualiza valor das medições
-  return humidity.relative_humidity; // Retorna valor da umidade
+  sensors_event_t humidity, temp;     // Cria objetos de temperatura e umidade
+  aht.getEvent(&humidity, &temp);     // Atualiza valor das medições
+  return humidity.relative_humidity;  // Retorna valor da umidade
+}
+
+// Retorna temperatura medida pelo sensor
+float getTemp() {
+  sensors_event_t humidity, temp;  // Cria objetos de temperatura e umidade
+  aht.getEvent(&humidity, &temp);  // Atualiza valor das medições
+  return temp.temperature;         // Retorna valor da temperatura
 }

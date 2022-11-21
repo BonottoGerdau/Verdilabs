@@ -8,8 +8,8 @@
 // Define pinos I2C do circuito. 
 // Nas próximas sprints, pretendemos centralizar a definição desses pinos no código-fonte principal,
 // para minimizar erros de pino
-#define SDA_PIN 10
-#define SLC_PIN 9
+#define SDA_PIN 5
+#define SLC_PIN 4
 
 // Define dimensões do LCD
 int lcdColumns = 16;
@@ -19,13 +19,14 @@ int lcdRows = 2;
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 
 // Inicializa o LCD
-void startDisplay() {
+void setupDisplay() {
   // Inicializa o I2C
   Wire.begin(SDA_PIN, SLC_PIN);
   // Inicializa o objeto de LCD
   lcd.init();
   // Liga o backlight do LCD
   lcd.backlight();
+  Serial.println("LCD funcionando");
 }
 
 // Mostra rotina de boas-vindas
