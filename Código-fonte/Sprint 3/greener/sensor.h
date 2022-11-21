@@ -5,8 +5,8 @@
 #include <Wire.h> // Biblioteca para I2C
 
 // Define pinos de I2C do sistema
-#define SDA_PIN 10
-#define SLC_PIN 9
+#define SDA_PIN 4
+#define SLC_PIN 5
 
 // Cria objeto de sensor
 Adafruit_AHTX0 aht;
