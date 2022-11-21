@@ -41,6 +41,11 @@ reiniciar o sistema
 #define yellowHumidity 8  // Led para medidas na zona de tolerância
 #define redHumidity 18    // Led para medidas fora da zona permitida
 
+const tempMax = 36;
+const tempMin = 28;
+const humidityMax = 95;
+const humidityMin = 70;
+
 void checkSensor();                            // Esta função checa se o sensor está funcionando e exibe o resultado no LCD
 void checkLeds();                              // Esta função testa todos os LEDs e exibe o resultado no LCD
 void lightUpLeds(float temp, float humidity);  // Esta função coordena o acioanemtno dos LEDs de acordo com as medidas de temperatura e umidade
@@ -95,19 +100,19 @@ void loop() {
 
 void showAlerts(float temp, float humidity) {
   // Se a temperatura está abaixo do permitido, mostra mensagem de urgência e sugestão de intervenção
-  if (temp < 28 * 0.95) {
+  if (temp < tempMin * 0.95) {
     displayMessage("TEMP BAIXA!", "Fechar janelas");
   // Se a temperatura está na zona de tolerância inferior, mostra mensagem de atenção
-  } else if (temp < 28) {
+  } else if (temp < tempMin) {
     displayMessage("Atencao!", "Temp baixando");
   // Se a temperatura está abaixo do permitido, mostra mensagens de urgência e sugestões de intervenção
-  } else if (temp > 36 * 1.1) {
+  } else if (temp > tempMax * 1.1) {
     displayMessage("TEMP ALTA!", "Abrir todas");
-  } else if (temp > 36 * 1.05) {
+  } else if (temp > tempMax * 1.05) {
     displayMessage("TEMP ALTA!", "Laterais 100%");
-  } else if (temp > 36 * 1.03) {
+  } else if (temp > tempMax * 1.03) {
     displayMessage("TEMP ALTA!", "Laterais 50%");
-  } else if (temp > 36) {
+  } else if (temp > tempMax) {
   // Se a temperatura está na zona de tolerância superior, mostra mensagem de atenção
     displayMessage("Atencao!", "Temp aumentando");
   }
@@ -115,13 +120,13 @@ void showAlerts(float temp, float humidity) {
   // que mostra apenas as leituras puras, será exibida por 6 segundos em vez de 3
 
   // Se a umidade está abaixo do permitido, mostra mensagem de urgência (no caso de umidade, não há propostas de intervenção)
-  if (humidity < 70 * 0.95) {
+  if (humidity < humidityMin * 0.95) {
     displayMessage("PERIGO!", "Umidade baixa!");
   // Se a temperatura está na zona de tolerância, mostra mensagem de atenção
-  } else if (humidity < 70) {
+  } else if (humidity < humidityMin) {
     displayMessage("ATENÇAO!", "Umidade baixando!");
   // Se a temperatura está acima do permitido, mostra mensagem de urgência
-  } else if (humidity > 95) {
+  } else if (humidity > humidityMax) {
     displayMessage("PERIGO!", "Umidade alta!");
   }
   delay(3000); // Espera 3 segundos independentemente das medidas. Se elas estiverem dentro do desejado, a última mensagem exibida
@@ -139,16 +144,16 @@ void lightUpLeds(float temp, float humidity) {
   digitalWrite(greenHumidity, LOW);
 
   // Quando a temperatura está fora do permitido, brilha o LED vermelho de temperatura
-  if (temp < 28 * 0.95) {
+  if (temp < tempMin * 0.95) {
     digitalWrite(redTemp, HIGH);
   // Quando a temperatura está na zona de tolerância, brilha o LED amarelo de temperatura
-  } else if (temp < 28) {
+  } else if (temp < tempMin) {
     digitalWrite(yellowTemp, HIGH);
   // Quando a temperatura está fora do permitido, brilha o LED vermelho de temperatura
-  } else if (temp > 36 * 1.1) {
+  } else if (temp > tempMax * 1.1) {
     digitalWrite(redTemp, HIGH);
   // Quando a temperatura está na zona de tolerância, brilha o LED amarelo de temperatura
-  } else if (temp > 36) {
+  } else if (temp > tempMax) {
     digitalWrite(yellowTemp, HIGH);
   // Quando a temperatura está dentro do permitido, brilha o LED verde de temperatura
   } else {
@@ -156,12 +161,12 @@ void lightUpLeds(float temp, float humidity) {
   }
 
   // Quando a umidade está fora do permitido, brilha o LED vermelho de umidade
-  if (humidity < 70 * 0.95) {
+  if (humidity < humidityMin * 0.95) {
     digitalWrite(redHumidity, HIGH);
   // Quando a umidade está na zona de tolerância, brilha o LED amarelo de umidade
-  } else if (humidity < 70) {
+  } else if (humidity < humidityMin) {
     digitalWrite(yellowHumidity, HIGH);
-  } else if (humidity > 95) {
+  } else if (humidity > humidityMax) {
     digitalWrite(redHumidity, HIGH);
   // Quando a umidade está dentro do permitido, brilha o LED verde de umidade
   } else {
