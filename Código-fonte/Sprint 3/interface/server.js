@@ -1,86 +1,108 @@
-// CÓDIGO DO SERVIDOR
+// CÓDIGO DO SERVIDOR DE GREENER: serve interface gráfica, recebe informações do ESP-32 e salva
+// no banco de dados, exibe histórico na interface
 
-// importa bibliotecas necessárias
+// importa bibliotecas necessárias para criar servidor (express) e se comunicar com database (sqlite3)
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 
-// cria servidor no endereço local e determina que a pasta frontend deve ser usada como source
+// cria servidor 
 const app = express();
-const hostname = '10.128.64.110';
+
+// define host e porta do servidor
+const hostname = '192.168.1.108';
 const port = 1234;
+
+// cria objetos para interpretar dados passados em requisições HTTP
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-app.use(express.static("../public/"));
-
+// define que pasta "public" deve ser utilizada como source para página principal (index.html)
+app.use(express.static("public"));
+// define que utilizaremos json em nossas comunicações
 app.use(express.json());
+
+// evita erros de CORS nas requisições de banco de dados
 const cors = require("cors");
 const corsOptions = {
     origin: '*',
-    credentials: true,            //access-control-allow-credentials:true
+    credentials: true,            
     optionSuccessStatus: 200
 }
-app.use(cors(corsOptions)) //
+app.use(cors(corsOptions)) 
 
 // caminho do banco de dados
 const DBPATH = 'db.db'
+
+// salva últimas leituras recebidas do ESP-32
 let currentReadings = [0, 0, 0, 0]
 
 
 /* DEFINIÇÃO DOS ENDPOINTS */
 
-app.get('/', function(request, response){
-    response.sendFile('public/index.html', { root: '.' });
-});
-
-// NETWORKS - checar registros cadastros na tabela NETWORK
+// Retorna todos os dados salvos no banco de dados
 app.get('/all_readings', (req, res) => {
+    // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    var sql = 'SELECT * FROM sensor ORDER BY datetime'; // ordena por name
+    var sql = 'SELECT * FROM sensor ORDER BY datetime'; // comando SQL
+    // Executa comando e devolve resultados em json
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
         }
         res.json(rows);
     });
-    db.close();
+    db.close(); // Fecha banco
 });
 
+// Retorna linhas do banco de dados entre certas datas e oriundas de certa estufa, segundo query HTTP
 app.get('/filtered_readings', (req, res) => {
+    // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    const { datetime_start, datetime_end, greenhouse } = req.query;
+    const { datetime_start, datetime_end, greenhouse } = req.query; // Desmembra query em constantes
+    
     var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + datetime_start + '" AND "' +
-        datetime_end + '") AND greenhouse == ' + Number.parseInt(greenhouse); // ordena por name
+        datetime_end + '") AND greenhouse == ' + Number.parseInt(greenhouse); // Filtra por data e estufa
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
         }
-        res.json(rows);
+        res.json(rows); // Retorna resultados em json
     });
     db.close();
 });
 
+// Retorna dados recebidos no último POST
 app.get('/last_readings', (req, res) => {
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json(currentReadings)
+
+    res.json(currentReadings) // Transforma array de últimas leituras em json
 });
 
-// NETWORKINSERT - inserir novos registros na tabela NETWORK
+// Insere dados recebidos em JSON no banco de dados e salva no array "currentReadings"
 app.post('/insert_reading', urlencodedParser, (req, res) => {
     res.statusCode = 200;
-    // insere valores de nome e tipo segundo a request enviada pelo cliente
     const db = new sqlite3.Database(DBPATH);
-    let reading = req.body
-    console.log(reading)
+
+    let reading = req.body // Salva dados da requisição em uma variável
+    // Cria comando SQL para inserir campos do body no banco de dados
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +
         reading.datetime + "', " + Number.parseFloat(reading.temperature) + ", " 
         + Number.parseFloat(reading.humidity) + ", " + Number.parseInt(reading.greenhouse) + ")";
+    
+        // Salva dados no array currentReadings 
+    // (no momento, hardocded para salvar apenas dados das estufa 1), 
+    // pois recebemos apenas dados dessa estufa por enquanto
     currentReadings[reading.greenhouse - 1] = reading
+    
     db.run(sql, [], err => {
         if (err) {
             throw err;
@@ -90,7 +112,7 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     res.end()
 });
 
-/* Inicia o servidor */
+// Inicia o servidor
 app.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
