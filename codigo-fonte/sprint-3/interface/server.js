@@ -9,7 +9,8 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 
 // define host e porta do servidor
-const port = process.env.PORT || 1234;
+const hostname = '192.168.1.108';
+const port = 1234;
 
 // cria objetos para interpretar dados passados em requisições HTTP
 const bodyParser = require('body-parser');
@@ -112,6 +113,6 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
+app.listen(port, hostname, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
 });
