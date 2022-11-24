@@ -1,0 +1,132 @@
+#header{
+  margin-top: 1%;
+}
+#section1 {
+  
+  width: 50%;
+ margin: auto;
+}
+#section2 {
+  
+  width: 50%;
+ margin: auto;
+}
+#section3 {
+  
+  width: 100%;
+ margin: auto;
+}
+#quantity{
+    border:none;
+    outline:none;
+    border-bottom:1px solid rgb(0, 0, 0);
+    background:transparent;
+    width: 30px;;
+   
+}
+#Estufa{
+  border:none;
+  outline:none;
+}
+#temp{  text-align: center;
+}
+#umidade{
+  text-align: center;
+}
+
+#rede-text img{
+  padding-bottom: 20px;
+  padding-right: 10px;
+  width: 40px;
+  height: 50px;
+}
+#rede-text{
+  padding-top: 40px;
+  padding-left: 10px;
+}
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+.wrapper {
+  text-align: center;
+  width: 100%;
+  margin: auto;
+}
+
+.wrapper .input-data{
+  height: 40px;
+  width: 100%;
+  position: relative;
+}
+.wrapper .input-data input{
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 17px;
+  border-bottom: 2px solid silver;
+}
+.input-data input:focus ~ label,
+.input-data input:valid ~ label{
+  transform: translateY(-20px);
+  font-size: 15px;
+  color: rgba(81, 146, 89, 1);
+}
+.wrapper .input-data label{
+  position: absolute;
+  bottom: 10px;
+  left: 30px;
+  color: grey;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.input-data .underline{
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  bottom: 0;
+}
+.input-data .underline:before{
+  position: center;
+  content: "";
+  height: 100%;
+  width: 100%;
+  background: rgba(81, 146, 89, 1);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+.input-data input:focus ~ .underline:before,
+.input-data input:valid ~ .underline:before{
+  transform: scaleX(1);
+}
+
+.input-data input:focus ~ img,
+.input-data input:valid ~ img{
+  transform: translateY(-20px);
+  font-size: 15px;
+  color: rgba(81, 146, 89, 1);
+}
+.wrapper .input-data img{
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  color: grey;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+#button{
+  background-color: rgba(81, 146, 89, 1);
+  color: white;
+  height: 25px;
+  width: 40%;
+  border-radius: 30px;
+  margin-top: 10px;
+  margin-left: 64%;
+
+}
