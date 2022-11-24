@@ -1,1 +1,0 @@
-Pasta para páginas ainda em desenvolvimento para as próximas sprints
