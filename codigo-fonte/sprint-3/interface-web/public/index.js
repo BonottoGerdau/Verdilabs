@@ -36,7 +36,7 @@ $(document).ready(function () {
 
     // Faz uma requisição GET para as últimas leituras recebidas do ESP pelo servidor
     const getReadings = function () {
-        fetch("http://192.168.1.108:1234/last_readings")
+        fetch("http://localhost:1234/last_readings")
             .then(response => response.json() // Transforma payload em json
                 .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
     }
@@ -44,6 +44,7 @@ $(document).ready(function () {
     // Checa medida de temperatura e exibe legenda correspondente, se necessário, 
     // e seta a flag de urgência e/ou alerta segundo regras do negócio
     function checkTemperature(temp) {
+        
         if (temp < tempMin * 0.95) {
             urgencyNeeded = true; // seta urgência como true
             $('#subtitle-temp').text("Estufa(s) frias!"); // exibe legenda de que estufas estão frias
@@ -58,10 +59,10 @@ $(document).ready(function () {
             $('#subtitle-temp').text("Estufa(s) superaquecidas!");
         } else if (temp > tempMax * 1.03) {
             urgencyNeeded = true;
-            $('#subtitle').text("Estufa(s) superaquecidas!");
+            $('#subtitle-temp').text("Estufa(s) superaquecidas!");
         } else if (temp > tempMax) {
             cautionNeeded = true;
-            $('#subtitle').text("Estufa(s) aquecendo");
+            $('#subtitle-temp').text("Estufa(s) aquecendo");
         } else if (temp > tempMin && temp < tempMax) {
             $('#subtitle-temp').text("");
         }
@@ -104,6 +105,8 @@ $(document).ready(function () {
         checkHumidity(humidity);
         checkTemperature(temp);
 
+        console.log({cautionNeeded, urgencyNeeded});
+
         // Se alguma medida estiver na zona de tolerância, troca ícone pela exclamação amarela, 
         // exibe "Atenção" no status e adicionar sombra amarela atrás do card da estufa
         if (cautionNeeded) {
@@ -120,7 +123,7 @@ $(document).ready(function () {
 
         // Se estiver tudo dentro de desejado, troca o ícone pelo OK verde, exibe "Tudo Certo" e remove
         // sombras coloridas do card da estufa
-        } else {
+        } else if (!urgencyNeeded && !cautionNeeded) {
             $("#status-image").attr("src", "assets/green.png");
             $('#status-text').text("Tudo certo!")
             $('#estufa1-card').css("box-shadow", "")
