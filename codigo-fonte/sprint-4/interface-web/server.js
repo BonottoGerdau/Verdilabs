@@ -57,6 +57,25 @@ app.get('/all_readings', (req, res) => {
     db.close(); // Fecha banco
 });
 
+app.get('/greenhouse_readings', (req, res) => {
+    const { greenhouse } = req.query;
+    // Define header e status de sucesso
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Inicia comunicação com database
+    const db = new sqlite3.Database(DBPATH);
+    var sql = 'SELECT * FROM sensor WHERE greenhouse = ' + greenhouse + ' ORDER BY datetime'; // comando SQL
+    // Executa comando e devolve resultados em json
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+        res.json(rows);
+    });
+    db.close(); // Fecha banco
+});
+
 // Retorna linhas do banco de dados entre certas datas e oriundas de certa estufa, segundo query HTTP
 app.get('/filtered_readings', (req, res) => {
     // Define header e status de sucesso
@@ -90,7 +109,7 @@ app.get('/last_readings', (req, res) => {
 app.post('/insert_reading', urlencodedParser, (req, res) => {
     res.statusCode = 200;
     const db = new sqlite3.Database(DBPATH);
-
+    console.log(req.body.datetime)
     let reading = req.body // Salva dados da requisição em uma variável
     // Cria comando SQL para inserir campos do body no banco de dados
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +
@@ -112,6 +131,8 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
-});
+app.listen(port, function() {
+    console.log(`Listening on port ${port}`);
+  });
+  
+module.exports = app;
