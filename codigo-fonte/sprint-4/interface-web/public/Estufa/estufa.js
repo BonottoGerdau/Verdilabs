@@ -1,13 +1,7 @@
 chart_labels = []
 humidity_dataset = [];
 
-const intervals = {
-    "1_minute": 1,
-    "5_minutes": 5,
-}
-
 let chosenInterval = "1_minute"
-
 
 const data = {
     labels: chart_labels,
@@ -59,6 +53,9 @@ function getReadings() {
                 })
                 myChart.data.labels = chart_labels
                 myChart.data.data = humidity_dataset
+                if(chosenInterval === "1min") {
+
+                }
                 myChart.data.labels = getEveryNth(chart_labels, 5);
                 myChart.data.data = getEveryNth(humidity_dataset, 5).slice(0, 49);
                 console.log(getEveryNth(chart_labels, 5))
