@@ -48,21 +48,17 @@
             Selecionar faixa de intervalo 
         </button>
         <div class="dropdown-menu" aria-labelledby="a" id="dropdown">
-            <a class="dropdown-item" id="1min" href="#">Intervalo: 1 minuto</a>
-            <a class="dropdown-item" id="5min" href="#">Intervalo: 5 minutos</a>
-            <a class="dropdown-item" id="10min" href="#">Intervalo: 10 minutos</a>
-            <a class="dropdown-item" id="20min" href="#">Intervalo: 20 minutos</a>
-            <a class="dropdown-item" id="1h" href="#">Intervalo: 1 hora</a>
-            <a class="dropdown-item" id="1dia" href="#">Intervalo: 1 dia </a>
-            <a class="dropdown-item" id="1sem" href="#">Intervalo: 1 semana </a>
-            <a class="dropdown-item" id="1mes" href="#">Intervalo: 1 mês </a>
-
+            <a class="dropdown-item" id="10m" href="#">Últimos 10 minutos</a>
+            <a class="dropdown-item" id="hour" href="#">Última hora</a>
+            <a class="dropdown-item" id="day" href="#">Último dia</a>
+            <a class="dropdown-item" id="week" href="#">Última semana</a>
+            <a class="dropdown-item" id="year" href="#">último mês</a>
         </div>
     </div>
-    <div id="chart-div" class="container" style="margin: auto">
+    <div id="chart-div" class="container" style="margin: auto;">
         <div class="card" style="width: 100%;">
             <div class="card-body" width="100%">
-                <canvas id="chart"></canvas>
+                <canvas id="chart" height="250px"></canvas>
             </div>
         </div>
     </div>
