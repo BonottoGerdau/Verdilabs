@@ -81,7 +81,7 @@ app.get('/filtered_readings', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
-
+    console.log(req.query)
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
     const { datetime_start, datetime_end, greenhouse } = req.query; // Desmembra query em constantes
@@ -113,7 +113,7 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     let reading = req.body // Salva dados da requisição em uma variável
     // Cria comando SQL para inserir campos do body no banco de dados
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +
-        reading.datetime + "', " + Number.parseFloat(reading.temperature) + ", " 
+        new Date(reading.datetime) + "', " + Number.parseFloat(reading.temperature) + ", " 
         + Number.parseFloat(reading.humidity) + ", " + Number.parseInt(reading.greenhouse) + ")";
     
         // Salva dados no array currentReadings 

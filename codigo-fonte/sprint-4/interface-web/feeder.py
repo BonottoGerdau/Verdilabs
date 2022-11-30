@@ -16,7 +16,7 @@ def post(timestamp):
         resp = requests.post(
             'http://localhost:1234/insert_reading', data=body) # Faz requisição
 
-start_time = datetime.datetime(year=2022, month=11, day=29, hour=0, minute=0, second=0)
+start_time = datetime.datetime(year=2022, month=11, day=30, hour=13, minute=0, second=0)
 for hour in range(24):
     for minute in range(60):
         print(start_time)

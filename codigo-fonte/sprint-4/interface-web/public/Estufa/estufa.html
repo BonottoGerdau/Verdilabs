@@ -13,11 +13,11 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <title>Estufa</title>
 </head>
 
-<body onload="getReadings()">
+<body onload="onload()">
     <div id="root" class="container-fluid">
         <div id="header" class="row">
             <div class="col-11">
@@ -47,7 +47,7 @@
             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Selecionar faixa de intervalo 
         </button>
-        <div class="dropdown-menu" aria-labelledby="a">
+        <div class="dropdown-menu" aria-labelledby="a" id="dropdown">
             <a class="dropdown-item" id="1min" href="#">Intervalo: 1 minuto</a>
             <a class="dropdown-item" id="5min" href="#">Intervalo: 5 minutos</a>
             <a class="dropdown-item" id="10min" href="#">Intervalo: 10 minutos</a>
@@ -55,7 +55,7 @@
             <a class="dropdown-item" id="1h" href="#">Intervalo: 1 hora</a>
             <a class="dropdown-item" id="1dia" href="#">Intervalo: 1 dia </a>
             <a class="dropdown-item" id="1sem" href="#">Intervalo: 1 semana </a>
-            <a class="dropdown-item" id="1mês" href="#">Intervalo: 1 mês </a>
+            <a class="dropdown-item" id="1mes" href="#">Intervalo: 1 mês </a>
 
         </div>
     </div>
