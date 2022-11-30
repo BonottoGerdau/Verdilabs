@@ -109,7 +109,6 @@ app.get('/last_readings', (req, res) => {
 app.post('/insert_reading', urlencodedParser, (req, res) => {
     res.statusCode = 200;
     const db = new sqlite3.Database(DBPATH);
-    console.log(req.body.datetime)
     let reading = req.body // Salva dados da requisição em uma variável
     // Cria comando SQL para inserir campos do body no banco de dados
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +

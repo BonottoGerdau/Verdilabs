@@ -4,15 +4,22 @@ let temperature_dataset = [];
 let chart_labels = []
 $('#dropdown a').on('click', function () {
     chosenInterval = ($(this).attr('id'));
+    humidity_dataset = []
+    temperature_dataset = []
+    chart_labels = []
+    dates = []
     if (chosenInterval === "10m") {
         getReadings10Min();
     } else if (chosenInterval === "hour") {
         getReadings1H();
     } else if (chosenInterval === "day") {
         getReadingsDay();
+    } else if (chosenInterval === "week") {
+        getReadingsWeek();
+    } else if (chosenInterval === "month") {
+        getReadingsMonth();
     }
 });
-
 
 const data = {
     labels: chart_labels,
@@ -72,12 +79,14 @@ const config = {
 
     },
 };
+
 let myChart = new Chart(
     document.getElementById('chart'),
     config
 );
 
 function onload() {
+    getReadings10Min();
 }
 
 function getEveryNth(arr, nth) {
@@ -107,13 +116,13 @@ function getReadings10Min() {
                     temperature_dataset.push(reading['temperature'])
                 })
                 chart_labels = []
-                humidity_dataset = humidity_dataset.slice(0, 59);
-                temperature_dataset = temperature_dataset.slice(0, 59)
+                humidity_dataset = humidity_dataset
+                temperature_dataset = temperature_dataset
                 dates.forEach(label => {
                     let date = moment(label);
                     chart_labels.push(date.format('kk:mm:ss'));
                 })
-                chart_labels = chart_labels.slice(0, 59);
+                chart_labels = chart_labels
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
@@ -134,20 +143,21 @@ function getReadings1H() {
         .then(response => response.json()
             .then(data => {
                 console.log(data)
+
                 data.forEach(reading => {
                     dates.push(new Date(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
                 chart_labels = []
-                humidity_dataset = getEveryNth(humidity_dataset, 5).slice(0, 59);
-                temperature_dataset = getEveryNth(temperature_dataset, 5).slice(0, 59)
+                humidity_dataset = getEveryNth(humidity_dataset, 5)
+                temperature_dataset = getEveryNth(temperature_dataset, 5)
                 dates.forEach(label => {
                     let date = moment(label);
                     chart_labels.push(date.format('kk:mm:ss'));
                 })
                 console.log(chart_labels)
-                chart_labels = getEveryNth(chart_labels, 5).slice(0, 59);
+                chart_labels = getEveryNth(chart_labels, 5);
                 console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
@@ -156,8 +166,12 @@ function getReadings1H() {
             }));
 }
 
-function getReadings() {
-    fetch("http://localhost:1234/greenhouse_readings?" + new URLSearchParams({
+function getReadingsDay() {
+    let start = moment().subtract(1, "day")
+    let end = moment()
+    fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
+        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
+        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
         greenhouse: 1
     }))
         .then(response => response.json()
@@ -165,28 +179,88 @@ function getReadings() {
                 data.forEach(reading => {
                     dates.push(new Date(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
+                    temperature_dataset.push(reading['temperature'])
                 })
                 chart_labels = []
-                if (chosenInterval === "1min") {
-                    myChart.data.data = humidity_dataset.slice(0, 59);
-                    dates.forEach(label => {
-                        let date = new Date(label);
-                        chart_labels.push(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
-                    })
-                    myChart.data.labels = chart_labels.slice(0, 59);
-                }
-                if (chosenInterval === "1min") {
-                    myChart.data.data = humidity_dataset.slice(0, 59);
-                    dates.forEach(label => {
-                        let date = new Date(label);
-                        chart_labels.push(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`);
-                    })
-                    myChart.data.labels = chart_labels.slice(0, 59);
-                }
-                /* myChart.data.labels = getEveryNth(chart_labels, 5);
-                myChart.data.data = getEveryNth(humidity_dataset, 5).slice(0, 49); */
+                humidity_dataset = getEveryNth(humidity_dataset, 60)
+                temperature_dataset = getEveryNth(temperature_dataset, 60)
+                dates.forEach(label => {
+                    let date = moment(label);
+                    chart_labels.push(date.format('kk[h]'));
+                })
+                console.log(chart_labels)
+                chart_labels = getEveryNth(chart_labels, 60)
+                console.log(chart_labels)
+                myChart.data.labels = chart_labels;
+                myChart.data.datasets[0].data = humidity_dataset;
+                myChart.data.datasets[1].data = temperature_dataset;
                 myChart.update()
             }));
-
 }
 
+function getReadingsWeek() {
+    let start = moment().subtract(1, "week")
+    let end = moment()
+    fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
+        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
+        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        greenhouse: 1
+    }))
+        .then(response => response.json()
+            .then(data => {
+                console.log(data)
+                data.forEach(reading => {
+                    dates.push(new Date(reading['datetime']))
+                    humidity_dataset.push(reading['humidity'])
+                    temperature_dataset.push(reading['temperature'])
+                })
+                chart_labels = []
+                humidity_dataset = getEveryNth(humidity_dataset, 720)
+                temperature_dataset = getEveryNth(temperature_dataset, 720)
+                dates.forEach(label => {
+                    let date = moment(label);
+                    chart_labels.push(date.format('DD/MM kk[h]'));
+                })
+                console.log(chart_labels)
+                chart_labels = getEveryNth(chart_labels, 720)
+                console.log(chart_labels)
+                myChart.data.labels = chart_labels;
+                myChart.data.datasets[0].data = humidity_dataset;
+                myChart.data.datasets[1].data = temperature_dataset;
+                myChart.update()
+            }));
+}
+
+function getReadingsMonth() {
+    let start = moment().subtract(1, "month")
+    let end = moment()
+    console.log({ start, end })
+    fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
+        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
+        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        greenhouse: 1
+    }))
+        .then(response => response.json()
+            .then(data => {
+                console.log(data)
+                data.forEach(reading => {
+                    dates.push(new Date(reading['datetime']))
+                    humidity_dataset.push(reading['humidity'])
+                    temperature_dataset.push(reading['temperature'])
+                })
+                chart_labels = []
+                humidity_dataset = getEveryNth(humidity_dataset, 4320);
+                temperature_dataset = getEveryNth(temperature_dataset, 4320)
+                dates.forEach(label => {
+                    let date = moment(label);
+                    chart_labels.push(date.format('DD/MM kk[h]'));
+                })
+                console.log(chart_labels)
+                chart_labels = getEveryNth(chart_labels, 4320);
+                console.log(chart_labels)
+                myChart.data.labels = chart_labels;
+                myChart.data.datasets[0].data = humidity_dataset;
+                myChart.data.datasets[1].data = temperature_dataset;
+                myChart.update()
+            }));
+}
