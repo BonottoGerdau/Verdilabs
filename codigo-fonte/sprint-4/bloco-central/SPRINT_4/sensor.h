@@ -12,7 +12,7 @@ int setupSensor()
   Wire.begin(SDA, SCL);
   Serial.println("Adafruit AHT10/AHT20 demo!");
  
-  if (! aht.begin()) 
+  if (! aht.begin()) // 
   {
     Serial.println("Could not find AHT? Check wiring");
     return 0;
@@ -29,7 +29,7 @@ float getHumidity() {
 }
 
 float getTemp() {
-  sensors_event_t humidity, temp; // Cria objetos de temperatura e umidade
+  sensors_event_t humidity, temp; // Cria objetos de temperatura e umidade 
   aht.getEvent(&humidity, &temp);  // Atualiza valor das medições
   return temp.temperature; // Retorna valor da temperatura
 }
