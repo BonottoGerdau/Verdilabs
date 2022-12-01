@@ -1,9 +1,11 @@
+
 // CÓDIGO DO SERVIDOR DE GREENER: serve interface gráfica, recebe informações do ESP-32 e salva
 // no banco de dados, exibe histórico na interface
 
 // importa bibliotecas necessárias para criar servidor (express) e se comunicar com database (sqlite3)
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+var moment = require('moment')
 
 // cria servidor 
 const app = express();
@@ -24,10 +26,10 @@ app.use(express.json());
 const cors = require("cors");
 const corsOptions = {
     origin: '*',
-    credentials: true,            
+    credentials: true,
     optionSuccessStatus: 200
 }
-app.use(cors(corsOptions)) 
+app.use(cors(corsOptions))
 
 // caminho do banco de dados
 const DBPATH = 'db.db'
@@ -85,10 +87,10 @@ app.get('/filtered_readings', (req, res) => {
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
     const { datetime_start, datetime_end, greenhouse } = req.query; // Desmembra query em constantes
-    
-    var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + datetime_start + '" AND "' +
-        datetime_end + '") AND greenhouse == ' + Number.parseInt(greenhouse); // Filtra por data e estufa
-    db.all(sql, [], (err, rows) => {
+    console.log(moment(datetime_end).format())
+    var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + moment(datetime_start).format() + '" AND "' +
+        moment(datetime_end).format() + '") AND greenhouse == ' + Number.parseInt(greenhouse); // Filtra por data e estufa
+        db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
         }
@@ -111,15 +113,16 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     const db = new sqlite3.Database(DBPATH);
     let reading = req.body // Salva dados da requisição em uma variável
     // Cria comando SQL para inserir campos do body no banco de dados
+    console.log(reading.datetime)
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +
-        new Date(reading.datetime) + "', " + Number.parseFloat(reading.temperature) + ", " 
+        moment(reading.datetime).format() + "', " + Number.parseFloat(reading.temperature) + ", "
         + Number.parseFloat(reading.humidity) + ", " + Number.parseInt(reading.greenhouse) + ")";
-    
-        // Salva dados no array currentReadings 
+
+    // Salva dados no array currentReadings 
     // (no momento, hardocded para salvar apenas dados das estufa 1), 
     // pois recebemos apenas dados dessa estufa por enquanto
     currentReadings[reading.greenhouse - 1] = reading
-    
+
     db.run(sql, [], err => {
         if (err) {
             throw err;
@@ -130,8 +133,8 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(port, function() {
+app.listen(port, function () {
     console.log(`Listening on port ${port}`);
-  });
-  
+});
+
 module.exports = app;

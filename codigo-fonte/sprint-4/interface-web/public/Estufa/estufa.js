@@ -2,13 +2,13 @@ let dates = []
 let humidity_dataset = [];
 let temperature_dataset = [];
 let chart_labels = []
-$('#dropdown a').on('click', function () {
-    chosenInterval = ($(this).attr('id'));
+$('select').on('click', function () {
+    chosenInterval = ($(this).val());
     humidity_dataset = []
     temperature_dataset = []
     chart_labels = []
     dates = []
-    if (chosenInterval === "10m") {
+    if (chosenInterval === "minute") {
         getReadings10Min();
     } else if (chosenInterval === "hour") {
         getReadings1H();
@@ -93,25 +93,26 @@ function getEveryNth(arr, nth) {
     const result = [];
 
     for (let i = 0; i < arr.length; i += nth) {
+
         result.push(arr[i]);
     }
-
+    result.push(arr[arr.length - 1])
     return result;
 }
 
 function getReadings10Min() {
     let start = moment().subtract(10, "minutes")
     let end = moment()
+    console.log({start, end})
     fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
-        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
-        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        datetime_start: start.format(),
+        datetime_end: end.format(),
         greenhouse: 1
     }))
         .then(response => response.json()
             .then(data => {
-                console.log(data)
                 data.forEach(reading => {
-                    dates.push(new Date(reading['datetime']))
+                    dates.push(moment(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
@@ -128,11 +129,11 @@ function getReadings10Min() {
                 myChart.update()
 
                 let tableRows = "";
-                for (let i = 0; i < chart_labels.length; i++) {
+                for (let i = chart_labels.length - 1; i >= 0; i--) {
                     tableRows += `
                     <tr>
-                            <th scope="row">${dates[i].toLocaleDateString()}</th>
-                            <td>${dates[i].toLocaleTimeString()}</td>
+                            <th scope="row">${dates[i].format("DD/MM/YY")}</th>
+                            <td>${dates[i].format("hh[h]mm")}</td>
                             <td>${temperature_dataset[i]} ºC</td>
                             <td>${humidity_dataset[i]}%</td>
                         </tr>`
@@ -145,12 +146,13 @@ function getReadings1H() {
     let start = moment().subtract(1, "hours")
     let end = moment()
     fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
-        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
-        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        datetime_start: start.format(),
+        datetime_end: end.format(),
         greenhouse: 1
     }))
         .then(response => response.json()
             .then(data => {
+                console.log(data)
                 data.forEach(reading => {
                     dates.push(new Date(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
@@ -159,18 +161,20 @@ function getReadings1H() {
                 chart_labels = []
                 dates = getEveryNth(dates, 5);
                 humidity_dataset = getEveryNth(humidity_dataset, 5)
+                console.log(humidity_dataset)
                 temperature_dataset = getEveryNth(temperature_dataset, 5)
                 dates.forEach(label => {
                     let date = moment(label);
                     chart_labels.push(date.format('kk:mm:ss'));
                 })
+                console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
                 myChart.update()
 
                 let tableRows = "";
-                for (let i = 0; i < chart_labels.length; i++) {
+                for (let i = chart_labels.length - 1; i >= 0; i--) {
                     tableRows += `
                     <tr>
                             <th scope="row">${dates[i].toLocaleDateString()}</th>
@@ -188,8 +192,8 @@ function getReadingsDay() {
     let start = moment().subtract(1, "day")
     let end = moment()
     fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
-        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
-        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        datetime_start: start.format(),
+        datetime_end: end.format(),
         greenhouse: 1
     }))
         .then(response => response.json()
@@ -207,12 +211,13 @@ function getReadingsDay() {
                     let date = moment(label);
                     chart_labels.push(date.format('kk[h]'));
                 })
+                console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
                 myChart.update()
                 let tableRows = ""
-                for (let i = 0; i < chart_labels.length; i++) {
+                for (let i = chart_labels.length - 1; i >= 0; i--) {
                     tableRows += `
                     <tr>
                             <th scope="row">${dates[i].toLocaleDateString()}</th>
@@ -228,9 +233,10 @@ function getReadingsDay() {
 function getReadingsWeek() {
     let start = moment().subtract(1, "week")
     let end = moment()
+    console.log('here')
     fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
-        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
-        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        datetime_start: start.format(),
+        datetime_end: end.format(),
         greenhouse: 1
     }))
         .then(response => response.json()
@@ -240,18 +246,30 @@ function getReadingsWeek() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
-                dates = getEveryNth(dates, 720);
+                dates = getEveryNth(dates, 1440);
                 chart_labels = []
-                humidity_dataset = getEveryNth(humidity_dataset, 720)
-                temperature_dataset = getEveryNth(temperature_dataset, 720)
+                humidity_dataset = getEveryNth(humidity_dataset, 1440)
+                temperature_dataset = getEveryNth(temperature_dataset, 1440)
                 dates.forEach(label => {
                     let date = moment(label);
                     chart_labels.push(date.format('DD/MM kk[h]'));
                 })
+                console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
                 myChart.update()
+                let tableRows = ""
+                for (let i = chart_labels.length - 1; i >= 0; i--) {
+                    tableRows += `
+                    <tr>
+                            <th scope="row">${dates[i].toLocaleDateString()}</th>
+                            <td>${dates[i].toLocaleTimeString()}</td>
+                            <td>${temperature_dataset[i]}</td>
+                            <td>${humidity_dataset[i]}</td>
+                        </tr>`
+                }
+                $("tbody").html(tableRows);
             }));
 }
 
@@ -260,8 +278,8 @@ function getReadingsMonth() {
     let end = moment()
     console.log({ start, end })
     fetch("http://localhost:1234/filtered_readings?" + new URLSearchParams({
-        datetime_start: start.format("YYYY-MM-DD kk:mm:ss"),
-        datetime_end: end.format("YYYY-MM-D kk:mm:ss"),
+        datetime_start: start.format(),
+        datetime_end: end.format(),
         greenhouse: 1
     }))
         .then(response => response.json()
@@ -272,17 +290,28 @@ function getReadingsMonth() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
-                dates = getEveryNth(dates, 4320);
+                dates = getEveryNth(dates, 1440);
                 chart_labels = []
-                humidity_dataset = getEveryNth(humidity_dataset, 4320);
-                temperature_dataset = getEveryNth(temperature_dataset, 4320)
+                humidity_dataset = getEveryNth(humidity_dataset, 1440);
+                temperature_dataset = getEveryNth(temperature_dataset, 1440)
                 dates.forEach(label => {
                     let date = moment(label);
-                    chart_labels.push(date.format('DD/MM kk[h]'));
+                    chart_labels.push(date.format('DD/MM - kk[h]'));
                 })
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
                 myChart.update()
+                let tableRows = ""
+                for (let i = chart_labels.length - 1; i >= 0; i--) {
+                    tableRows += `
+                    <tr>
+                            <th scope="row">${dates[i].toLocaleDateString()}</th>
+                            <td>${dates[i].toLocaleTimeString()}</td>
+                            <td>${temperature_dataset[i]}</td>
+                            <td>${humidity_dataset[i]}</td>
+                        </tr>`
+                }
+                $("tbody").html(tableRows);
             }));
 }

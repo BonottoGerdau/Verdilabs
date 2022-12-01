@@ -43,17 +43,14 @@
         </div>
     </div>
     <div class="container dropdown" style="width:100%">
-        <button class="btn btn-secondary dropdown-toggle" style="width:100%" type="button" id="a"
-            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Selecionar faixa de intervalo 
-        </button>
-        <div class="dropdown-menu" aria-labelledby="a" id="dropdown">
-            <a class="dropdown-item" id="10m" href="#">Últimos 10 minutos</a>
-            <a class="dropdown-item" id="hour" href="#">Última hora</a>
-            <a class="dropdown-item" id="day" href="#">Último dia</a>
-            <a class="dropdown-item" id="week" href="#">Última semana</a>
-            <a class="dropdown-item" id="month" href="#">Último mês</a>
-        </div>
+        <select>
+            <option selected disabled>Selecione a faixa de intervalo</option>
+            <option value="minute">Últimos 10 minutos</option>
+            <option value="hour">Última hora</option>
+            <option value="day">Último dia</option>
+            <option value="week">Última semana</option>
+            <option value="month">Último mês</option>
+        </select>
     </div>
     <div id="chart-div" class="container" style="margin: auto;">
         <div class="card" style="width: 100%;">
