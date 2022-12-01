@@ -2,6 +2,7 @@
 #include "display.h"
 #include <WiFiManager.h>
 #include "wi-fi.h"
+#include <iostream>
 
 #define wifiButton 1
 #define greenTemp 13
@@ -10,6 +11,20 @@
 #define greenHumidity 46
 #define yellowHumidity 8
 #define redHumidity 18
+
+
+ using namespace std;
+ // Driver code 
+ int main()
+ {
+ const char *s = "1234"; 
+ int x; 
+ sscanf(s, "%d", &x);
+ cout << "\nThe integer value of x : " << x;
+ return 0;
+ }
+
+
 
 bool tempAlert = true;
 bool humidityAlert = true;
@@ -132,6 +147,44 @@ void lightUpLeds(float temp, float humidity) {
     digitalWrite(greenHumidity, HIGH);
   }
 }
+
+// função: erro grave 1 - temp e humi estão lidos de forma equívocada 
+
+void erro1 (float temp, float humidity) {
+  if () {
+    displayMessage("Leitura errada");
+  } 
+  IF(ISNUMBER(erro1); "Leitura errada");
+
+  delay(3000);
+
+
+
+
+
+
+
+
+
+  if (! aht.begin()) // 
+  {
+    Serial.println("Sensor desconectado, tente novamente.");
+    return 0;
+  }
+  Serial.println("AHT10 conectado");
+  return 1;
+
+
+
+
+
+
+
+
+
+
+
+
 
 void checkSensor() {
   while (true) {
