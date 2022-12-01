@@ -9,6 +9,7 @@ void I2Cscan() {
   int nDevices;
   Serial.println("Scanning...");
   nDevices = 0;
+  String addresses[2];
   for(address = 1; address < 127; address++ ) {
     Wire.beginTransmission(address);
     error = Wire.endTransmission();
@@ -26,6 +27,7 @@ void I2Cscan() {
         Serial.print("0");
       }
       Serial.println(address,HEX);
+      displayMessage("HI", "HI");
     }    
   }
   if (nDevices == 0) {
@@ -34,5 +36,5 @@ void I2Cscan() {
   else {
     Serial.println("done\n");
   }
-  delay(5000);          
+  delay(1000);          
 }

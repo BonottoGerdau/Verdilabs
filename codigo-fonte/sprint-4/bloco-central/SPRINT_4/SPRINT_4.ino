@@ -2,6 +2,7 @@
 #include "display.h"
 #include <WiFiManager.h>
 #include "wi-fi.h"
+#include "i2cScanner.h"
 
 #define greenTemp 13
 #define blueTemp 12
@@ -18,6 +19,7 @@ WiFiManager wm;
 
 void checkSensor();
 void connectWiFi();
+void checkSystem();
 
 void setup() {
   Serial.begin(115200);
@@ -35,7 +37,7 @@ void setup() {
 }
 
 void loop() {
-  
+  checkSystem();
   float temp = getTemp();                                                // Pega temperatura atual
   float humidity = getHumidity();                                        // Pega umidade atual
   String tempMessage = "Temp: " + String(temp) + " " + (char)223 + "C";  // Cria mensagem de temperatura para LCD
@@ -98,7 +100,7 @@ void showAlerts(float temp, float humidity) {
 }
 
 void checkSystem() {
-  scan();
+  I2Cscan();
   checkSensor();
   checkConnection();
 }
@@ -242,4 +244,11 @@ void checkLeds() {
   displayMessage("UMI [VERMELHO]", "    OPERANTE    ");
   delay(3000);
   turnOnRGB('0', 'h');
+}
+
+void checkConnection() {
+  while (!getWiFiStatus()) {
+    turnOnRGB('a');
+    displayMessage("Problemas", "de conexao");
+  }
 }

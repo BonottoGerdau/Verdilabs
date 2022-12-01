@@ -20,7 +20,7 @@ void sendReading(float temperature, float humidity, int greenhouse) {
     int httpResponseCode = http.sendRequest("POST", httpRequestData);
 
     Serial.print("HTTP Response code: ");
-    Serial.println(httpResponseCode,DEC);
+    Serial.println(httpResponseCode, DEC);
     Serial.println();
 
     // Free resources
@@ -31,6 +31,9 @@ void sendReading(float temperature, float humidity, int greenhouse) {
   }
 }
 
-void checkConnection() {
-  return WiFi.status() == WL_CONNECTED;
+bool getWiFiStatus() {
+  if (WiFi.status() == WL_CONNECTED) {
+    return 1;
+  }
+  return 0;
 }
