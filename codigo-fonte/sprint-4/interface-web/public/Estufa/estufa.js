@@ -240,7 +240,7 @@ function getReadingsWeek() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
-                dates = getEveryNth(dates, 5);
+                dates = getEveryNth(dates, 720);
                 chart_labels = []
                 humidity_dataset = getEveryNth(humidity_dataset, 720)
                 temperature_dataset = getEveryNth(temperature_dataset, 720)
@@ -272,7 +272,7 @@ function getReadingsMonth() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
-                dates = getEveryNth(dates, 5);
+                dates = getEveryNth(dates, 4320);
                 chart_labels = []
                 humidity_dataset = getEveryNth(humidity_dataset, 4320);
                 temperature_dataset = getEveryNth(temperature_dataset, 4320)
