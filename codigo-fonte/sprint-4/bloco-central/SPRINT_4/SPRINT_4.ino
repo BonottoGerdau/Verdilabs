@@ -2,29 +2,13 @@
 #include "display.h"
 #include <WiFiManager.h>
 #include "wi-fi.h"
-#include <iostream>
 
-#define wifiButton 1
 #define greenTemp 13
-#define yellowTemp 12
+#define blueTemp 12
 #define redTemp 11
 #define greenHumidity 46
-#define yellowHumidity 8
-#define redHumidity 18
-
-
- using namespace std;
- // Driver code 
- int main()
- {
- const char *s = "1234"; 
- int x; 
- sscanf(s, "%d", &x);
- cout << "\nThe integer value of x : " << x;
- return 0;
- }
-
-
+#define blueHumidity 8
+#define redHumidity 17
 
 bool tempAlert = true;
 bool humidityAlert = true;
@@ -33,43 +17,25 @@ bool humidityDanger = true;
 WiFiManager wm;
 
 void checkSensor();
+void connectWiFi();
 
 void setup() {
   Serial.begin(115200);
-  pinMode(wifiButton, INPUT_PULLUP);
   pinMode(redTemp, OUTPUT);
-  pinMode(yellowTemp, OUTPUT);
+  pinMode(blueTemp, OUTPUT);
   pinMode(greenTemp, OUTPUT);
-  pinMode(yellowHumidity, OUTPUT);
+  pinMode(blueHumidity, OUTPUT);
   pinMode(redHumidity, OUTPUT);
   pinMode(greenHumidity, OUTPUT);
-  Serial.println("#########AQUI#########");
   setupDisplay();
   welcome();
   checkSensor();
-
-  wm.resetSettings();
-  WiFi.mode(WIFI_STA);
-  WiFiManager wm;
-  displayMessage("Conecte-se a", "rede Greener");
-  bool res;
-  res = wm.autoConnect("Greener", "verdilabs");  // password protected ap
-
-  if (!res) {
-    Serial.println("Failed to connect");
-    displayMessage("Falha em", "conectar");
-    delay(2000);
-    ESP.restart();
-  } else {
-    //if you get here you have connected to the WiFi
-    Serial.println("connected...yeey :)");
-    displayMessage("Conectado", "com sucesso");
-    delay(2000);
-  }
+  connectWiFi();
   checkLeds();
 }
 
 void loop() {
+  
   float temp = getTemp();                                                // Pega temperatura atual
   float humidity = getHumidity();                                        // Pega umidade atual
   String tempMessage = "Temp: " + String(temp) + " " + (char)223 + "C";  // Cria mensagem de temperatura para LCD
@@ -81,6 +47,27 @@ void loop() {
   delay(4000);
 
   showAlerts(temp, humidity);
+}
+
+void connectWiFi() {
+  wm.resetSettings();
+  WiFi.mode(WIFI_STA);
+  WiFiManager wm;
+  displayMessage("Conecte-se a", "rede Greener");
+  bool res;
+  res = wm.autoConnect("Greener");  // password protected ap
+
+  if (!res) {
+    Serial.println("Failed to connect");
+    displayMessage("Falha em", "conectar");
+    delay(2000);
+    ESP.restart();
+  } else {
+    //if you get here you have connected to the WiFi
+    Serial.println("Conectado!");
+    displayMessage("Conectado", "com sucesso");
+    delay(2000);
+  }
 }
 
 void showAlerts(float temp, float humidity) {
@@ -110,126 +97,149 @@ void showAlerts(float temp, float humidity) {
   delay(3000);
 }
 
+void checkSystem() {
+  scan();
+  checkSensor();
+  checkConnection();
+}
+
+void turnOnRGB(char state, char led = '0') {
+  if (state == 'a') {
+    analogWrite(redTemp, 0);
+    analogWrite(blueTemp, 255);
+    analogWrite(greenTemp, 255);
+    analogWrite(redHumidity, 0);
+    analogWrite(blueHumidity, 255);
+    analogWrite(greenHumidity, 255);
+    delay(500);
+    analogWrite(redTemp, 255);
+    analogWrite(blueTemp, 255);
+    analogWrite(greenTemp, 255);
+    analogWrite(redHumidity, 255);
+    analogWrite(blueHumidity, 255);
+    analogWrite(greenHumidity, 255);
+    delay(500);
+  } else {
+    if (led == 't') {
+      if (state == 'g') {
+        analogWrite(redTemp, 255);
+        analogWrite(blueTemp, 0);
+        analogWrite(greenTemp, 255);
+      } else if (state == 'y') {
+        analogWrite(redTemp, 0);
+        analogWrite(blueTemp, 255);
+        analogWrite(greenTemp, 0);
+      } else if (state == 'r') {
+        analogWrite(redTemp, 0);
+        analogWrite(blueTemp, 255);
+        analogWrite(greenTemp, 255);
+      } else if (state == '0') {
+        analogWrite(redTemp, 255);
+        analogWrite(blueTemp, 255);
+        analogWrite(greenTemp, 255);
+      }
+    } else if (led == 'h') {
+      if (state == 'g') {
+        analogWrite(redHumidity, 255);
+        analogWrite(blueHumidity, 0);
+        analogWrite(greenHumidity, 255);
+      } else if (state == 'y') {
+        analogWrite(redHumidity, 0);
+        analogWrite(blueHumidity, 255);
+        analogWrite(greenHumidity, 0);
+      } else if (state == 'r') {
+        analogWrite(redHumidity, 0);
+        analogWrite(blueHumidity, 255);
+        analogWrite(greenHumidity, 255);
+      } else if (state == '0') {
+        analogWrite(redHumidity, 255);
+        analogWrite(blueHumidity, 255);
+        analogWrite(greenHumidity, 255);
+      }
+    }
+  }
+}
+
 void lightUpLeds(float temp, float humidity) {
   tempDanger = false;
   tempAlert = false;
   humidityDanger = false;
   humidityAlert = false;
 
-  digitalWrite(redTemp, LOW);
-  digitalWrite(yellowTemp, LOW);
-  digitalWrite(greenTemp, LOW);
-  digitalWrite(redHumidity, LOW);
-  digitalWrite(yellowHumidity, LOW);
-  digitalWrite(greenHumidity, LOW);
+  turnOnRGB('0', 't');
+  turnOnRGB('0', 'h');
 
   if (temp < 28 * 0.95) {
     tempDanger = true;
-    digitalWrite(redTemp, HIGH);
+    turnOnRGB('r', 't');
   } else if (temp < 28) {
-    digitalWrite(yellowTemp, HIGH);
+    turnOnRGB('y', 't');
   } else if (temp > 36 * 1.1) {
     tempDanger = true;
-    digitalWrite(redTemp, HIGH);
+    turnOnRGB('r', 't');
   } else if (temp > 36) {
-    digitalWrite(yellowTemp, HIGH);
+    turnOnRGB('y', 't');
   } else {
-    digitalWrite(greenTemp, HIGH);
+    turnOnRGB('g', 't');
   }
 
   if (humidity < 70 * 0.95) {
-    digitalWrite(redHumidity, HIGH);
+    turnOnRGB('r', 'h');
   } else if (humidity < 70) {
-    digitalWrite(yellowHumidity, HIGH);
+    turnOnRGB('y', 'h');
   } else if (humidity > 95) {
-    digitalWrite(redHumidity, HIGH);
+    turnOnRGB('r', 'h');
   } else {
-    digitalWrite(greenHumidity, HIGH);
+    turnOnRGB('g', 'h');
   }
 }
-
-// função: erro grave 1 - temp e humi estão lidos de forma equívocada 
-
-void erro1 (float temp, float humidity) {
-  if () {
-    displayMessage("Leitura errada");
-  } 
-  IF(ISNUMBER(erro1); "Leitura errada");
-
-  delay(3000);
-
-
-
-
-
-
-
-
-
-  if (! aht.begin()) // 
-  {
-    Serial.println("Sensor desconectado, tente novamente.");
-    return 0;
-  }
-  Serial.println("AHT10 conectado");
-  return 1;
-
-
-
-
-
-
-
-
-
-
-
-
 
 void checkSensor() {
   while (true) {
     if (setupSensor()) {
-      displayMessage("Sensor foi", "encontrado");
-      delay(2000);
-      break;
+      setupDisplay();
+      return;
     } else {
       displayMessage("Sensor não", "encontrado");
-      delay(2000);
+      turnOnRGB('a');
     }
   }
 }
 
 void checkLeds() {
+  turnOnRGB('0', 't');
+  turnOnRGB('0', 'h');
+
   displayMessage("Iniciando teste", "de LEDs");
   delay(3000);
 
-  digitalWrite(greenTemp, HIGH);
+  turnOnRGB('g', 't');
   displayMessage("TEMP [VERDE]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(greenTemp, LOW);
+  turnOnRGB('0', 't');
 
-  digitalWrite(yellowTemp, HIGH);
+  turnOnRGB('y', 't');
   displayMessage("TEMP [AMARELO]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(yellowTemp, LOW);
+  turnOnRGB('0', 't');
 
-  digitalWrite(redTemp, HIGH);
+  turnOnRGB('r', 't');
   displayMessage("TEMP [VERMELHO]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(redTemp, LOW);
+  turnOnRGB('0', 't');
 
-  digitalWrite(greenHumidity, HIGH);  
+  turnOnRGB('g', 'h');
   displayMessage("UMI [VERDE]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(greenHumidity, LOW);
+  turnOnRGB('0', 'h');
 
-  digitalWrite(yellowHumidity, HIGH);
+  turnOnRGB('y', 'h');
   displayMessage("UMI [AMARELO]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(yellowHumidity, LOW);
+  turnOnRGB('0', 'h');
 
-  digitalWrite(redHumidity, HIGH);
+  turnOnRGB('r', 'h');
   displayMessage("UMI [VERMELHO]", "    OPERANTE    ");
   delay(3000);
-  digitalWrite(redHumidity, LOW);
+  turnOnRGB('0', 'h');
 }

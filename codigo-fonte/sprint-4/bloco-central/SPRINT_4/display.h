@@ -1,9 +1,9 @@
 /* Este módulo agrega funções para exibir mensagens no LCD no sistema de IoT Greener */
-
 // Importa bibliotecas necessárias
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <string>
+#include "displaySymbols.h"
 
 // Define pinos I2C do circuito. 
 // Nas próximas sprints, pretendemos centralizar a definição desses pinos no código-fonte principal,
@@ -40,6 +40,10 @@ void welcome() {
   lcd.print("< Greener >");
   
   // Espera 5 segundos
+  delay(5000);
+  lcd.createChar(1, simboloTermometro);
+  lcd.createChar(2, simboloUmidade);
+  lcd.createChar(3, simboloWifi);
   delay(5000);
   // Limpa LCD
   lcd.clear();

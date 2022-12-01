@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-const char* serverName = "http://10.128.1.222:80/insert_reading";
+const char* serverName = "https://greener.onrender.com/insert_reading";
 
 void sendReading(float temperature, float humidity, int greenhouse) {
   //Check WiFi connection status
@@ -29,4 +29,8 @@ void sendReading(float temperature, float humidity, int greenhouse) {
   } else {
     Serial.println("WiFi Disconnected");
   }
+}
+
+void checkConnection() {
+  return WiFi.status() == WL_CONNECTED;
 }
