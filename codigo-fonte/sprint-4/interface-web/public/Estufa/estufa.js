@@ -86,7 +86,7 @@ let myChart = new Chart(
 );
 
 function onload() {
-    getReadings10Min();
+    getReadingsWeek();
 }
 
 function getEveryNth(arr, nth) {

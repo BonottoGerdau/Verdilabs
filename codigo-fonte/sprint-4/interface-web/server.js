@@ -103,12 +103,12 @@ app.get('/filtered_readings', (req, res) => {
 app.get('/last_readings', (req, res) => {
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
-
     res.json(currentReadings) // Transforma array de últimas leituras em json
 });
 
 // Insere dados recebidos em JSON no banco de dados e salva no array "currentReadings"
 app.post('/insert_reading', urlencodedParser, (req, res) => {
+    console.log(req.body)
     res.statusCode = 200;
     const db = new sqlite3.Database(DBPATH);
     let reading = req.body // Salva dados da requisição em uma variável
@@ -122,7 +122,7 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     // (no momento, hardocded para salvar apenas dados das estufa 1), 
     // pois recebemos apenas dados dessa estufa por enquanto
     currentReadings[reading.greenhouse - 1] = reading
-
+    console.log(currentReadings)
     db.run(sql, [], err => {
         if (err) {
             throw err;
