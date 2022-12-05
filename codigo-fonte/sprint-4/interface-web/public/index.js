@@ -44,16 +44,15 @@ $(document).ready(function () {
     // Checa medida de temperatura e exibe legenda correspondente, se necessário, 
     // e seta a flag de urgência e/ou alerta segundo regras do negócio
     function checkTemperature(temp, greenhouse) {
-        if (temp < tempMin * 0.95) {
+        if (temp < tempMin * 0.95) { // checa condições
             urgencyNeeded = true; // seta urgência como true
-            $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(203, 19, 19, 0.5), 0 10px 20px 0 rgba(203, 19, 19, 0.4)")
-            $('#subtitle-temp').text("Estufa(s) frias!"); // exibe legenda de que estufas estão frias
-        } else if (temp < tempMin) {
-            $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(251, 203, 6, 0.5), 0 10px 20px 0 rgba(251, 203, 6, 0.4)")
+            $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(203, 19, 19, 0.5), 0 10px 20px 0 rgba(203, 19, 19, 0.4)") // dá contorno vermelho ao card da estufa
+            $('#subtitle-temp').text("Estufa(s) frias!"); // exibe legenda do estado atual
+        } else if (temp < tempMin) { // A lógica acima é aplicada para as outras faixas de medida, mudando o contorno e a legenda de acordo com a gravidade da situação
             cautionNeeded = true;
+            $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(251, 203, 6, 0.5), 0 10px 20px 0 rgba(251, 203, 6, 0.4)")
             $('#subtitle-temp').text("Estufa(s) esfriando");
         } else if (temp > tempMax * 1.1) {
-            console.log("LALA")
             urgencyNeeded = true;
             $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(203, 19, 19, 0.5), 0 10px 20px 0 rgba(203, 19, 19, 0.4)")
             $('#subtitle-temp').text("Estufa(s) superaquecidas!");
@@ -70,14 +69,12 @@ $(document).ready(function () {
             cautionNeeded = true;
             $('#subtitle-temp').text("Estufa(s) aquecendo");
         } else if (temp > tempMin && temp < tempMax) {
-            console.log("GOOD TEMP")
             $('#subtitle-temp').text("");
             $(`#estufa${greenhouse}-card`).css("box-shadow", "")
-
         }
     }
 
-    // Checa medidade de umidade e altera legenda e flags de urgência/alerta conforme necessário
+    // Checa medida de de umidade e altera legenda e flags de urgência/alerta conforme necessário, seguindo a lógica anterior
     function checkHumidity(humidity, greenhouse) {
         if (humidity < humidityMin * 0.95) {
             urgencyNeeded = true;
@@ -110,7 +107,6 @@ $(document).ready(function () {
             checkHumidity(Number.parseFloat(readings[i].temperature), i + 1)
             checkTemperature(Number.parseFloat(readings[i].humidity), i + 1)
         }
-
         // Se alguma medida estiver na zona de tolerância, troca ícone pela exclamação amarela, 
         // exibe "Atenção" no status e adicionar sombra amarela atrás do card da estufa
         if (cautionNeeded) {
@@ -121,7 +117,6 @@ $(document).ready(function () {
         } if (urgencyNeeded) {
             $("#status-image").attr("src", "assets/red.png");
             $('#status-text').text("Perigo!")
-
             // Se estiver tudo dentro de desejado, troca o ícone pelo OK verde, exibe "Tudo Certo" e remove
             // sombras coloridas do card da estufa
         } else if (!urgencyNeeded && !cautionNeeded) {

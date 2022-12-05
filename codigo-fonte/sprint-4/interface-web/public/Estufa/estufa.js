@@ -1,13 +1,18 @@
-let dates = []
-let humidity_dataset = [];
-let temperature_dataset = [];
-let chart_labels = []
+// Variáveis para guardar dados recebidos nos endpoints
+let dates = [] // Guarda datas
+let humidity_dataset = []; // Guarda valores de umidade
+let temperature_dataset = []; // Guarda valores de temperatura
+let chart_labels = [] // Guarda strings de eixo x para o gráfico
+
+// Esta função roda toda vez que a seleção do dropdown muda
 $('select').on('click', function () {
-    chosenInterval = ($(this).val());
+    chosenInterval = ($(this).val()); // Valor escolhido no dropdown
+    // Esvazia arrays
     humidity_dataset = []
     temperature_dataset = []
     chart_labels = []
     dates = []
+    // Chama função correspondente ao intervalo escolhido
     if (chosenInterval === "minute") {
         getReadings10Min();
     } else if (chosenInterval === "hour") {
@@ -21,17 +26,18 @@ $('select').on('click', function () {
     }
 });
 
+// Define dados do gráfico
 const data = {
-    labels: chart_labels,
-    datasets: [
+    labels: chart_labels, // Eixo X
+    datasets: [ // Define um dataset para temperatura e um para umidade
         {
-            label: 'Umidade',
-            data: humidity_dataset,
+            label: 'Umidade', // Título
+            data: humidity_dataset, // Dados (array)
             fill: false,
             borderColor: 'rgb(75, 192, 192)',
-            color: 'rgb(75, 192, 192)',
+            color: 'rgb(75, 192, 192)', // Cor da linha
             backgroundColor: 'rgb(75, 192, 192)',
-            yAxisID: 'y',
+            yAxisID: 'y', // Define um eixo para cada dataset, um de cada lado
         },
         {
             label: 'Temperatura',
@@ -44,9 +50,10 @@ const data = {
     ]
 }
 
+// Configurações do gráfico
 const config = {
     type: 'line',
-    data: data,
+    data: data, // Traz json de dados para o gráfico
     options: {
         responsive: true,
         interaction: {
@@ -55,7 +62,7 @@ const config = {
         },
         stacked: false,
         plugins: {
-            title: {
+            title: { // Não mostra título
                 display: false,
             }
         },
@@ -69,26 +76,26 @@ const config = {
                 type: 'linear',
                 display: true,
                 position: 'right',
-
-                // grid line settings
                 grid: {
-                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                    drawOnChartArea: false,
                 },
             },
         },
-
     },
 };
 
+// Cria objeto de gráfico e posiciona no div desejado
 let myChart = new Chart(
     document.getElementById('chart'),
     config
 );
 
+// Esta função é executada toda vez que a página é carregada
 function onload() {
     getReadingsWeek();
 }
 
+// Devolve array dos enésimos elementos de um array
 function getEveryNth(arr, nth) {
     const result = [];
 
@@ -100,10 +107,11 @@ function getEveryNth(arr, nth) {
     return result;
 }
 
+// Função para intervalos de 10 minutos
 function getReadings10Min() {
-    let start = moment().subtract(10, "minutes")
-    let end = moment()
-    console.log({start, end})
+    let start = moment().subtract(10, "minutes") // Começa dez minutos antes do momento atual
+    let end = moment() // Termina no momento atual
+    // GET com filtro por data de início, data de fim e estufa
     fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
         datetime_start: start.format(),
         datetime_end: end.format(),
@@ -111,24 +119,28 @@ function getReadings10Min() {
     }))
         .then(response => response.json()
             .then(data => {
+                // Desmembra body em arrays para datas, umidade e temperatura
                 data.forEach(reading => {
                     dates.push(moment(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
+                // Esvazia legendas
                 chart_labels = []
-                humidity_dataset = humidity_dataset
-                temperature_dataset = temperature_dataset
+                // Transforma datas em strings
                 dates.forEach(label => {
                     let date = moment(label);
                     chart_labels.push(date.format('kk:mm:ss'));
                 })
+                // Atualiza valores no objeto de gráfico
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
-                myChart.update()
+                myChart.update() // Executa atualizações
 
+                // Cria string de html a ser adicionada
                 let tableRows = "";
+                // Cria linhas da tabela com valores atualizados
                 for (let i = chart_labels.length - 1; i >= 0; i--) {
                     tableRows += `
                     <tr>
@@ -138,11 +150,13 @@ function getReadings10Min() {
                             <td>${humidity_dataset[i]}%</td>
                         </tr>`
                 }
-                $("tbody").html(tableRows);
+                $("tbody").html(tableRows); // Adiciona string ao html de fato
             }));
 }
 
+// Função para intervalos de 1 hora
 function getReadings1H() {
+    // Segue a mesma lógica da função anterior
     let start = moment().subtract(1, "hours")
     let end = moment()
     fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
@@ -152,13 +166,13 @@ function getReadings1H() {
     }))
         .then(response => response.json()
             .then(data => {
-                console.log(data)
                 data.forEach(reading => {
                     dates.push(new Date(reading['datetime']))
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
                 chart_labels = []
+                // Pega dados de 5 em 5 minutos
                 dates = getEveryNth(dates, 5);
                 humidity_dataset = getEveryNth(humidity_dataset, 5)
                 console.log(humidity_dataset)
@@ -167,7 +181,6 @@ function getReadings1H() {
                     let date = moment(label);
                     chart_labels.push(date.format('kk:mm:ss'));
                 })
-                console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
@@ -187,8 +200,9 @@ function getReadings1H() {
             }));
 }
 
+// Função para intervalos de 1 hora
 function getReadingsDay() {
-    console.log("DIA")
+    // Segue a mesma lógica da função anterior
     let start = moment().subtract(1, "day")
     let end = moment()
     fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
@@ -203,6 +217,7 @@ function getReadingsDay() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
+                // Pega dados de 1 em 1 hora
                 dates = getEveryNth(dates, 60);
                 chart_labels = []
                 humidity_dataset = getEveryNth(humidity_dataset, 60)
@@ -211,7 +226,6 @@ function getReadingsDay() {
                     let date = moment(label);
                     chart_labels.push(date.format('kk[h]'));
                 })
-                console.log(chart_labels)
                 myChart.data.labels = chart_labels;
                 myChart.data.datasets[0].data = humidity_dataset;
                 myChart.data.datasets[1].data = temperature_dataset;
@@ -230,10 +244,10 @@ function getReadingsDay() {
             }));
 }
 
+// Função para intervalos de 1 semana
 function getReadingsWeek() {
     let start = moment().subtract(1, "week")
     let end = moment()
-    console.log('here')
     fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
         datetime_start: start.format(),
         datetime_end: end.format(),
@@ -246,6 +260,7 @@ function getReadingsWeek() {
                     humidity_dataset.push(reading['humidity'])
                     temperature_dataset.push(reading['temperature'])
                 })
+                // Pega dados de 1 em 1 dia
                 dates = getEveryNth(dates, 1440);
                 chart_labels = []
                 humidity_dataset = getEveryNth(humidity_dataset, 1440)
@@ -273,6 +288,7 @@ function getReadingsWeek() {
             }));
 }
 
+// Função para intervalos de 1 mês
 function getReadingsMonth() {
     let start = moment().subtract(1, "month")
     let end = moment()
@@ -292,6 +308,7 @@ function getReadingsMonth() {
                 })
                 dates = getEveryNth(dates, 1440);
                 chart_labels = []
+                // Pega dados de dia em dia
                 humidity_dataset = getEveryNth(humidity_dataset, 1440);
                 temperature_dataset = getEveryNth(temperature_dataset, 1440)
                 dates.forEach(label => {
