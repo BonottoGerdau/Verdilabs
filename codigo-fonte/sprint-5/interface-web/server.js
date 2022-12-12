@@ -37,7 +37,6 @@ const DBPATH = 'db.db'
 // salva últimas leituras recebidas do ESP-32
 let currentReadings = [0, 0, 0, 0]
 
-
 /* DEFINIÇÃO DOS ENDPOINTS */
 
 // Retorna todos os dados salvos no banco de dados
@@ -137,4 +136,4 @@ app.listen(port, function () {
     console.log(`Listening on port ${port}`);
 });
 
-module.exports = app;
+module.exports = app; // Exporta para funcionar na hospedagem remota
