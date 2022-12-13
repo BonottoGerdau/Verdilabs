@@ -41,6 +41,8 @@ $(document).ready(function () {
                 .then(data => {
                     if (data.error) {
                         console.log(data.error)
+                        document.getElementById('status-image').src = "assets/Xcinza.png"; 
+                        document.getElementById("status-text").innerHTML = ("Error:" + data.error);
                     } else {
                         fetch("http://localhost:1234/last_readings")
                             .then(response => response.json() // Transforma payload em json
