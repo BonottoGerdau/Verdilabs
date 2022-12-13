@@ -36,6 +36,7 @@ const DBPATH = 'db.db'
 
 // salva últimas leituras recebidas do ESP-32
 let currentReadings = [0, 0, 0, 0]
+let error = null
 
 /* DEFINIÇÃO DOS ENDPOINTS */
 
@@ -129,6 +130,22 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     });
     db.close();
     res.end()
+});
+
+app.post('/insert_error', urlencodedParser, (req, res) => {
+    console.log(req.body)
+    res.statusCode = 200;
+    error = req.body // Salva dados da requisição em uma variável
+    error.datetime = moment()
+    // Cria comando SQL para inserir campos do body no banco de dados
+    res.end()
+});
+
+app.get('/error', urlencodedParser, (req, res) => {
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Cria comando SQL para inserir campos do body no banco de dados
+    res.json(error)
 });
 
 // Inicia o servidor

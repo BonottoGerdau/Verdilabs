@@ -36,9 +36,19 @@ $(document).ready(function () {
 
     // Faz uma requisição GET para as últimas leituras recebidas do ESP pelo servidor
     const getReadings = function () {
-        fetch("http://localhost:1234/last_readings")
+        fetch("http://localhost:1234/error")
             .then(response => response.json() // Transforma payload em json
-                .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
+                .then(data => {
+                    if (data.error) {
+                        console.log(data.error)
+                    } else {
+                        fetch("http://localhost:1234/last_readings")
+                            .then(response => response.json() // Transforma payload em json
+                                .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
+                    }
+                })) // Passa json para a função de atualizar cards de estufas
+
+
     }
 
     // Checa medida de temperatura e exibe legenda correspondente, se necessário, 
@@ -68,7 +78,7 @@ $(document).ready(function () {
         } else if (temp > tempMax) {
             $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(251, 203, 6, 0.5), 0 10px 20px 0 rgba(251, 203, 6, 0.4)")
             cautionNeeded = true;
-        } 
+        }
     }
 
     // Checa medida de de umidade e altera legenda e flags de urgência/alerta conforme necessário, seguindo a lógica anterior
