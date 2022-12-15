@@ -24,6 +24,8 @@ Para a última sprint, pretendemos desenvolver as seguintes metas:
 #include "display.h"      // Inicializa e coordena exibição de mensagens e rotinas no LCD
 #include <WiFiManager.h>  // Gerencia configuração de Wi-Fi através de página Web e hotspot
 #include "wi-fi.h"        // Módulo para coordenar envio de requisições HTTP
+#include "i2cScanner.h"
+#include "data.h"
 
 // Definição de pinos do RGB de feedback para temperatura
 #define greenTemp 13
@@ -35,12 +37,6 @@ Para a última sprint, pretendemos desenvolver as seguintes metas:
 #define blueHumidity 8
 #define redHumidity 17
 
-// Declaração de parâmetros das faixas de tolerância (valores mínimos e máximos para temperatura e umidade)
-const tempMax = 36;
-const tempMin = 28;
-const humidityMax = 95;
-const humidityMin = 70;
-
 // Variáveis que guardam estado atual do sistema para exibição (ou não) de alertas e mensagens no display
 bool tempAlert = true;       // Referente a temperatura no extremo da zona de tolerância
 bool humidityAlert = true;   // Referente a umidade no extremo da zona de tolerância
@@ -51,9 +47,10 @@ void checkSensor();  // Esta função checa se o sensor está funcionando e exib
 void connectWiFi();  // Esta função gerencia a configuração de Wi-Fi para conexão
 void checkSystem();  // Esta função gerencia o processo de detecção e tratamento de erros no sistema
 
+WiFiManager wm;  // Cria objeto para configuração de Wi-Fi
+
 void setup() {
   Serial.begin(115200);  // Define velocidade da comunicação serial com monitor segundo o padrão do ESP-32
-
   // Inicializa os pinos dos RGBs
   pinMode(redTemp, OUTPUT);
   pinMode(blueTemp, OUTPUT);
@@ -61,13 +58,19 @@ void setup() {
   pinMode(blueHumidity, OUTPUT);
   pinMode(redHumidity, OUTPUT);
   pinMode(greenHumidity, OUTPUT);
-
-  WiFiManager wm;  // Cria objeto para configuração de Wi-Fi
-
   setupDisplay();  // Inicializa display LCD
   welcome();       // Exibe boas-vindas no LCD
   checkSensor();   // Checa se o sensor está funcionando
   connectWiFi();   // Faz conexão com o Wi-Fi
+  initCurrentParameters();
+  Serial.print("temp max: ");
+  Serial.println(tempMax);
+  Serial.print("temp min: ");
+  Serial.println(tempMin);
+  Serial.print("h max: ");
+  Serial.println(humidityMax);
+  Serial.print("h min: ");
+  Serial.println(humidityMin);
   checkLeds();     // Realiza teste de cores nos RGB
 }
 
@@ -91,6 +94,7 @@ void connectWiFi() {
   WiFi.mode(WIFI_STA);  // Define Wi-Fi como Station Mode, permitindo a conexão com uma rede estabelecida a partir de um ponto de acesso
 
   displayMessage("Conecte-se a", "rede Greener");
+  //wm.resetSettings();
 
   // Este método condição inicia um blocking loop para 1. iniciar um hotspot; 2. conectar-se automaticamente com a rede local, se as credenciais estiverem
   // salvas, ou esperar a configuração do nome e senha da rede local pela interface no IP 192.168.4.1, salvando essas credencias para uso posterior
@@ -147,8 +151,10 @@ void showAlerts(float temp, float humidity) {
 
 // Faz varredura para identificar erros e mostrar alertas.
 void checkSystem() {
-  checkSensor();      // Checa se o sensor está funcionando
+  checkSensor();
+  // Checa se o sensor está funcionando
   checkConnection();  // Checa se o ESP está conectado ao Wi-Fi
+  sendNoError();
 }
 
 // Função para controlar a cor de cada led RGB. Recebe o estado, correspondente à cor desejada ('g', 'y', 'r'), estado de "alerta",
@@ -195,17 +201,17 @@ void turnOnRGB(char state, char led = '0') {
       }
     } else if (led == 'h') {  // Faz o mesmo se o argumento passado for para umidade
       if (state == 'g') {
-        analogWrite(redHumidity, 255);
-        analogWrite(blueHumidity, 0);
-        analogWrite(greenHumidity, 255);
-      } else if (state == 'y') {
         analogWrite(redHumidity, 0);
         analogWrite(blueHumidity, 255);
         analogWrite(greenHumidity, 0);
-      } else if (state == 'r') {
-        analogWrite(redHumidity, 0);
-        analogWrite(blueHumidity, 255);
+      } else if (state == 'y') {
+        analogWrite(redHumidity, 255);
+        analogWrite(blueHumidity, 0);
         analogWrite(greenHumidity, 255);
+      } else if (state == 'r') {
+        analogWrite(redHumidity, 255);
+        analogWrite(blueHumidity, 0);
+        analogWrite(greenHumidity, 0);
       } else if (state == '0') {
         analogWrite(redHumidity, 255);
         analogWrite(blueHumidity, 255);
@@ -236,14 +242,14 @@ void giveLightFeedback(float temp, float humidity) {
 
   // Se a umidade for menor do que 95% do mínimo, acende LED vermelho (perigo)
   if (humidity < humidityMin * 0.95) {
-  turnOnRGB('r', 'h');
-  // Se a temperatura for menor do que o mínimo, mas acima de 95% desse valor, acende LED amarelo (atenção)
+    turnOnRGB('r', 'h');
+    // Se a temperatura for menor do que o mínimo, mas acima de 95% desse valor, acende LED amarelo (atenção)
   } else if (humidity < humidityMin) {
     turnOnRGB('y', 'h');
-  // Se a temperatura for maior do que o máximo, acende LED vermelho (perigo)
+    // Se a temperatura for maior do que o máximo, acende LED vermelho (perigo)
   } else if (humidity > humidityMax) {
     turnOnRGB('r', 'h');
-  } else { // Se a temperatura estiver normal, acende LED verde
+  } else {  // Se a temperatura estiver normal, acende LED verde
     turnOnRGB('g', 'h');
   }
 }
@@ -251,14 +257,17 @@ void giveLightFeedback(float temp, float humidity) {
 // Checa se sensor está funcionando e exibe sinais de erro caso não
 void checkSensor() {
   while (true) {          // Checa continuamente até sensor ser encontrado
-    if (setupSensor()) {  // Se sensor for encontrado]
+    if (setupSensor()) {  // Se sensor for encontrado
                           // Reinicializa o display, pois erros de comunicação I2C em um periférico podem afetas outros. Logo, caso o sensor tenha falhado
                           // e afetado a conexão do LCD, ela pode ser reestabelecida antes que mais mensagens sejam exibidas
       setupDisplay();
       return;  // Sai da função
     } else {   // Caso sensor não seja encontrado, liga RGBs em estado de alerta e mostra mensagem de erro
+      Serial.println("Sensor não encontrado");
+      sendSensorError();
       displayMessage("Sensor não", "encontrado");
       turnOnRGB('a');
+      delay(500);
     }
   }
 }
@@ -282,7 +291,7 @@ void checkLeds() {
 
   // Liga o RGB de temperatura no amarelo por 3 segundos e mostra esse estado no display
   turnOnRGB('y', 't');
-  displayMessage("TEMP [AMARELO]", "    OPERANTE    ");
+  displayMessage("TEMP [AZUL]", "    OPERANTE    ");
   delay(3000);
   // Apaga RGB de temperatura
   turnOnRGB('0', 't');
@@ -303,7 +312,7 @@ void checkLeds() {
 
   // Liga o RGB de umidade no amarelo por 3 segundos e mostra esse estado no display
   turnOnRGB('y', 'h');
-  displayMessage("UMI [AMARELO]", "    OPERANTE    ");
+  displayMessage("UMI [AZUL]", "    OPERANTE    ");
   delay(3000);
   // Apaga RGB de umidade
   turnOnRGB('0', 'h');

@@ -6,6 +6,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 var moment = require('moment')
+var hostname = "10.128.65.52";
 
 // cria servidor 
 const app = express();
@@ -36,7 +37,8 @@ const DBPATH = 'db.db'
 
 // salva últimas leituras recebidas do ESP-32
 let currentReadings = [0, 0, 0, 0]
-let error = null
+let parameters = [0, 0, 0, 0]
+let error = "0"
 
 /* DEFINIÇÃO DOS ENDPOINTS */
 
@@ -90,13 +92,94 @@ app.get('/filtered_readings', (req, res) => {
     console.log(moment(datetime_end).format())
     var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + moment(datetime_start).format() + '" AND "' +
         moment(datetime_end).format() + '") AND greenhouse == ' + Number.parseInt(greenhouse); // Filtra por data e estufa
-        db.all(sql, [], (err, rows) => {
+    db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
         }
         res.json(rows); // Retorna resultados em json
     });
     db.close();
+});
+
+app.get('/tempMin', (req, res) => {
+    // Define header e status de sucesso
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Inicia comunicação com database
+    const db = new sqlite3.Database(DBPATH);
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+        res.json(rows[0].tempMin); // Retorna resultados em json
+    });
+    db.close();
+});
+
+app.get('/tempMax', (req, res) => {
+    // Define header e status de sucesso
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Inicia comunicação com database
+    const db = new sqlite3.Database(DBPATH);
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+        res.json(rows[0].tempMax); // Retorna resultados em json
+    });
+    db.close();
+});
+
+app.get('/humidityMin', (req, res) => {
+    // Define header e status de sucesso
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Inicia comunicação com database
+    const db = new sqlite3.Database(DBPATH);
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+        res.json(rows[0].humidityMin); // Retorna resultados em json
+    });
+    db.close();
+});
+
+app.get('/humidityMax', (req, res) => {
+    // Define header e status de sucesso
+    res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Inicia comunicação com database
+    const db = new sqlite3.Database(DBPATH);
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+        res.json(rows[0].humidityMax); // Retorna resultados em json
+    });
+    db.close();
+});
+
+app.post('/insert_parameters', (req, res) => {
+    res.statusCode = 200;
+    const db = new sqlite3.Database(DBPATH);
+    let parameters = req.body // Salva dados da requisição em uma variável
+    // Cria comando SQL para inserir campos do body no banco de dados
+    sql = "INSERT INTO parameter (tempMin, tempMax, humidityMin, humidityMax) VALUES ('" +
+        Number.parseFloat(parameters.tempMin) + "', " + Number.parseFloat(parameters.tempMax) + ", "
+        + Number.parseFloat(parameters.humidityMin) + ", " + Number.parseFloat(parameters.humidityMax) + ")";
+    db.run(sql, [], err => {
+        if (err) {
+            throw err;
+        }
+    });
+    db.close();
+    res.end();
 });
 
 // Retorna dados recebidos no último POST
@@ -108,12 +191,10 @@ app.get('/last_readings', (req, res) => {
 
 // Insere dados recebidos em JSON no banco de dados e salva no array "currentReadings"
 app.post('/insert_reading', urlencodedParser, (req, res) => {
-    console.log(req.body)
     res.statusCode = 200;
     const db = new sqlite3.Database(DBPATH);
     let reading = req.body // Salva dados da requisição em uma variável
     // Cria comando SQL para inserir campos do body no banco de dados
-    console.log(reading.datetime)
     sql = "INSERT INTO sensor (datetime, temperature, humidity, greenhouse) VALUES ('" +
         moment(reading.datetime).format() + "', " + Number.parseFloat(reading.temperature) + ", "
         + Number.parseFloat(reading.humidity) + ", " + Number.parseInt(reading.greenhouse) + ")";
@@ -149,7 +230,7 @@ app.get('/error', urlencodedParser, (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(port, function () {
+app.listen(port, hostname, function () {
     console.log(`Listening on port ${port}`);
 });
 

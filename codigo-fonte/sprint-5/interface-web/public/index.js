@@ -9,13 +9,29 @@ Este script também atende apenas a estufa 1 no momento. Suas funções serão g
 para os outros cards e medidas nas próximas sprints. */
 
 
-$(document).ready(function () {
+$(document).ready(async function () {
+    let tempMin, tempMax, humidityMin, humidityMax;
+    await fetch("http://10.128.65.52:1234/tempMin").then(response => response.json()
+    .then(data => {
+        tempMin = Number.parseInt(data);
+    }))
 
-    // Constantes para guardar limites dos intervalos permitidos para cada indicador
-    const tempMin = 28;
-    const tempMax = 36;
-    const humidityMin = 70;
-    const humidityMax = 95;
+    await fetch("http://10.128.65.52:1234/tempMax").then(response => response.json()
+    .then(data => {
+        tempMax = Number.parseInt(data);
+    }))
+
+    await fetch("http://10.128.65.52:1234/humidityMin").then(response => response.json()
+    .then(data => {
+        humidityMin = Number.parseInt(data);
+    }))
+
+    await fetch("http://10.128.65.52:1234/humidityMax").then(response => response.json()
+    .then(data => {
+        humidityMax = Number.parseInt(data);
+    }))
+
+    console.log({tempMin, tempMax, humidityMin, humidityMax})
 
     // Variáveis que guardam estado do sistema, isto é, 
     // se é necessário mostrar mensagens de alerta e/ou urgência
@@ -36,30 +52,24 @@ $(document).ready(function () {
 
     // Faz uma requisição GET para as últimas leituras recebidas do ESP pelo servidor
     const getReadings = function () {
-        fetch("http://localhost:1234/error")
+        fetch("http://10.128.65.52:1234/error")
             .then(response => response.json() // Transforma payload em json
                 .then(data => {
-                    if (data.error) {
+                    if (data.error != "0") {
                         console.log(data.error)
                         document.getElementById('status-image').src = "assets/Xcinza.png"; 
-                        document.getElementById("status-text").innerHTML = ("Error:" + data.error);
+                        document.getElementById("status-text").innerHTML = ("Erro de " + data.error);
                     } else {
-                        fetch("http://localhost:1234/last_readings")
+                        fetch("http://10.128.65.52:1234/last_readings")
                             .then(response => response.json() // Transforma payload em json
                                 .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
                     }
                 })) // Passa json para a função de atualizar cards de estufas
-
-
     }
 
     // Checa medida de temperatura e exibe legenda correspondente, se necessário, 
     // e seta a flag de urgência e/ou alerta segundo regras do negócio
     function checkTemperature(temp, greenhouse) {
-        console.log("checa temp")
-        console.log(temp)
-        console.log(tempMin * 0.95)
-        console.log(temp < tempMin * 0.95)
         if (temp < tempMin * 0.95) { // checa condições
             urgencyNeeded = true; // seta urgência como true
             $(`#estufa${greenhouse}-card`).css("box-shadow", "0 4px 4px 0 rgba(203, 19, 19, 0.5), 0 10px 20px 0 rgba(203, 19, 19, 0.4)") // dá contorno vermelho ao card da estufa

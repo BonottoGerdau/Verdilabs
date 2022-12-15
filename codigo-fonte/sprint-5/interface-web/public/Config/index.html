@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <link href="index.css" rel='stylesheet'>
+    <title>Configurações</title>
+</head>
+
+<body>
+    <div id="root" class="container-fluid">
+        <div id="header">
+            <div class="row">
+                <div class="col-11">
+                    <h1 id="title"><b>Configurações</b></h1>
+                </div>
+                <div class="col-1">
+                    <a href="../index.html">
+                        <img src="jardinagem-em-casa 2.png" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="rede-text" class="d-flex justify-content-left">
+            <p><img src="image 18.png">
+            <h3><b>Critérios de alarmes</b></h3>
+            </p>
+        </div>
+        <section id="section3">
+            <div class="row">
+                <div id="temp">
+                    <h5><b>Temperatura</b></h5>
+                    <img src="4 1.png" alt=""> <input type="number" id="tempMin" name="quantity" class="quantity"
+                        min="1" max="100"> <b>até</b> <input type="number" id="tempMax" name="quantity" class="quantity"
+                        min="1" max="100">
+                </div>
+
+                <div id="umidade">
+                    <h5><b>Umidade</b></h5>
+                    <img src="4 1.png" alt=""><input type="number" id="humidityMin" name="quantity" class="quantity"
+                        min="1" max="100"> <b>até</b> <input type="number" id="humidityMax" name="quantity"
+                        class="quantity" min="1" max="100">
+                </div>
+                <div class="d-flex justify-content-center" id="salvar">
+                    <button class="d-flex justify-content-center" id="button" type="button">Salvar</button>
+                </div>
+        </section>
+
+
+        <script src="config.js"></script>
+</body>
+
+
+</html>

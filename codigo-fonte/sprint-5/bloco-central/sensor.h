@@ -5,19 +5,13 @@
 Adafruit_AHTX0 aht;  // Inicializa objeto para o sensor
 
 // Define pinos I2C
-#define SDA 5
-#define SCL 4
+#define SDA 4
+#define SCL 5
 
 // Esta função inicializa o sensor e retorna verdadeiro se ele for localizado com sucesso; falso caso contrário
-int setupSensor() {
+bool setupSensor() {
   Wire.begin(SDA, SCL);  // Inicia comunicação I2C
-  if (!aht.begin()) {    // Tenta localizar sensor. Se não conseguir, exibe mensagem de erro no monitor e retorna 0.
-    Serial.println("Sensor não encontrado");
-    return 0;
-  }
-  // Se conseguir, exibe mensagem de sucesso e retorna 1
-  Serial.println("Sensor encontrado");
-  return 1;
+  return aht.begin();
 }
 
 // Retorna umidade medida pelo sensor

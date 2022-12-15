@@ -16,7 +16,7 @@
   width: 100%;
  margin: auto;
 }
-#quantity{
+.quantity{
     border:none;
     outline:none;
     border-bottom:1px solid rgb(0, 0, 0);

@@ -33,7 +33,9 @@
             </div>
             <!-- Botão de configurações --->
             <div class="col-1">
+                <a href="../Config/index.html">
                 <img src="../assets/config.png" style="width:4vw;margin:0">
+                </a>
             </div>
         </div>
     </div>
@@ -41,7 +43,7 @@
     <div id="status" class="container row" style="margin: auto">
         <!-- Status --->
         <div class="col-10">
-            <h3>Tudo certo!</h3>
+            <h3 id="status-text">Tudo certo!</h3>
         </div>
         <!-- Ícone de notificação --->
         <div class="col-1">
@@ -53,7 +55,7 @@
         </div>
     </div>
     <!-- Dropdown de intervalo de medições --->
-    <div class="container dropdown" style="width:100%">
+    <div class="container dropdown" style="width:100%; margin-top: 2vh;">
         <select>
             <option selected disabled>Selecione a faixa de intervalo</option>
             <option value="minute">Últimos 10 minutos</option>
@@ -93,7 +95,10 @@
         </div>
     </div>
     <!-- Biblioteca para gráficos --->
+    <script src="table2csv.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Script desta página --->
     <script src="estufa.js"></script>
 
