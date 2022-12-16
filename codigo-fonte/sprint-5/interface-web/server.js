@@ -6,7 +6,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 var moment = require('moment')
-var hostname = "10.128.65.52";
 
 // cria servidor 
 const app = express();
@@ -230,7 +229,7 @@ app.get('/error', urlencodedParser, (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(port, hostname, function () {
+app.listen(port, function () {
     console.log(`Listening on port ${port}`);
 });
 

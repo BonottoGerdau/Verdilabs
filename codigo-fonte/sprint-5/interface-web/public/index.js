@@ -11,22 +11,22 @@ para os outros cards e medidas nas próximas sprints. */
 
 $(document).ready(async function () {
     let tempMin, tempMax, humidityMin, humidityMax;
-    await fetch("http://10.128.65.52:1234/tempMin").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/tempMin").then(response => response.json()
     .then(data => {
         tempMin = Number.parseInt(data);
     }))
 
-    await fetch("http://10.128.65.52:1234/tempMax").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/tempMax").then(response => response.json()
     .then(data => {
         tempMax = Number.parseInt(data);
     }))
 
-    await fetch("http://10.128.65.52:1234/humidityMin").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/humidityMin").then(response => response.json()
     .then(data => {
         humidityMin = Number.parseInt(data);
     }))
 
-    await fetch("http://10.128.65.52:1234/humidityMax").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/humidityMax").then(response => response.json()
     .then(data => {
         humidityMax = Number.parseInt(data);
     }))
@@ -46,13 +46,16 @@ $(document).ready(async function () {
 
             $('#time').html(moment().format('LT')); // Hora no header é exibida da forma brasileira
             $('#estufa1-time').html(moment().format('LT')); // Hora do card é exibida da forma brasileira
+            $('#estufa2-time').html(moment().format('LT')); // Hora do card é exibida da forma brasileira
+            $('#estufa3-time').html(moment().format('LT')); // Hora do card é exibida da forma brasileira
+            $('#estufa4-time').html(moment().format('LT')); // Hora do card é exibida da forma brasileira
             $('#date').html(moment().format('LL')); // Data no header é exibida da forma brasileira
         }, 1000);
     })
 
     // Faz uma requisição GET para as últimas leituras recebidas do ESP pelo servidor
     const getReadings = function () {
-        fetch("http://10.128.65.52:1234/error")
+        fetch("https://greener-g6it.onrender.com/error")
             .then(response => response.json() // Transforma payload em json
                 .then(data => {
                     if (data.error != "0") {
@@ -60,7 +63,7 @@ $(document).ready(async function () {
                         document.getElementById('status-image').src = "assets/Xcinza.png"; 
                         document.getElementById("status-text").innerHTML = ("Erro de " + data.error);
                     } else {
-                        fetch("http://10.128.65.52:1234/last_readings")
+                        fetch("https://greener-g6it.onrender.com/last_readings")
                             .then(response => response.json() // Transforma payload em json
                                 .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
                     }

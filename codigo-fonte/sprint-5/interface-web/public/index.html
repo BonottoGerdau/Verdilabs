@@ -46,7 +46,7 @@ para enriquecer a experiência do usuário -->
                 </div>
                 <!-- Botão de configurações -->
                 <div class="col-1"><a href="Config/index.html">
-                    <img src="assets/config.png" style="width:5vw">
+                        <img src="assets/config.png" style="width:5vw">
                     </a>
                 </div>
             </div>
@@ -91,7 +91,15 @@ para enriquecer a experiência do usuário -->
                     <a class="greenhouseLink" id="estufa2">
                         <div id="estufa2-card" class="card greenhouse-card" style="width: 100%;">
                             <div class="card-body" width="100%">
-                                <h6 class="card-subtitle mb-2 text-muted">Estufa 2</h6>
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h6 class="card-subtitle mb-2 text-muted">Estufa 2</h6>
+                                    </div>
+                                    <div class="col-5">
+                                        <h6 id="estufa2-time" style="text-align: right"
+                                            class="card-subtitle mb-2 text-muted">00:00</h6>
+                                    </div>
+                                </div>
                                 <h2 style="text-align:center" id="temp-estufa2">0 ºC</h2>
                                 <h2 style="text-align:center" id="hum-estufa2">0%</h2>
                             </div>
@@ -104,7 +112,15 @@ para enriquecer a experiência do usuário -->
                     <!-- Estufa 3 -->
                     <div id="estufa3-card" class="card greenhouse-card" style="width: 100%;">
                         <div class="card-body" width="100%">
-                            <h6 class="card-subtitle mb-2 text-muted">Estufa 3</h6>
+                            <div class="row">
+                                <div class="col-7">
+                                    <h6 class="card-subtitle mb-2 text-muted">Estufa 3</h6>
+                                </div>
+                                <div class="col-5">
+                                    <h6 id="estufa3-time" style="text-align: right"
+                                        class="card-subtitle mb-2 text-muted">00:00</h6>
+                                </div>
+                            </div>
                             <h2 style="text-align:center" id="temp-estufa3">0 ºC</h2>
                             <h2 style="text-align:center" id="hum-estufa3">0%</h2>
                         </div>
@@ -114,7 +130,15 @@ para enriquecer a experiência do usuário -->
                     <!-- Estufa 4 -->
                     <div class="card greenhouse-card" style="width: 100%;">
                         <div id="estufa4-card" class="card-body" width="100%">
-                            <h6 class="card-subtitle mb-2 text-muted">Estufa 4</h6>
+                            <div class="row">
+                                <div class="col-7">
+                                    <h6 class="card-subtitle mb-2 text-muted">Estufa 4</h6>
+                                </div>
+                                <div class="col-5">
+                                    <h6 id="estufa4-time" style="text-align: right"
+                                        class="card-subtitle mb-2 text-muted">00:00</h6>
+                                </div>
+                            </div>
                             <h2 style="text-align:center" id="temp-estufa4">0 ºC</h2>
                             <h2 style="text-align:center" id="hum-estufa4">0%</h2>
                         </div>
@@ -125,6 +149,6 @@ para enriquecer a experiência do usuário -->
     </div>
     <!-- Conecta ao script Javascript para fazer atualizações assíncronas -->
     <script src="index.js"></script>
-    </body>
+</body>
 
 </html>

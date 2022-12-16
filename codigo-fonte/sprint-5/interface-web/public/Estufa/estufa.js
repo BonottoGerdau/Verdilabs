@@ -1,21 +1,21 @@
 $(document).ready(async function () {
     let tempMin, tempMax, humidityMin, humidityMax;
-    await fetch("http://10.128.65.52:1234/tempMin").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/tempMin").then(response => response.json()
         .then(data => {
             tempMin = Number.parseInt(data);
         }))
 
-    await fetch("http://10.128.65.52:1234/tempMax").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/tempMax").then(response => response.json()
         .then(data => {
             tempMax = Number.parseInt(data);
         }))
 
-    await fetch("http://10.128.65.52:1234/humidityMin").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/humidityMin").then(response => response.json()
         .then(data => {
             humidityMin = Number.parseInt(data);
         }))
 
-    await fetch("http://10.128.65.52:1234/humidityMax").then(response => response.json()
+    await fetch("https://greener-g6it.onrender.com/humidityMax").then(response => response.json()
         .then(data => {
             humidityMax = Number.parseInt(data);
         }))
@@ -23,7 +23,7 @@ $(document).ready(async function () {
 
 
     const getReadings = function () {
-        fetch("http://10.128.65.52:1234/error")
+        fetch("https://greener-g6it.onrender.com/error")
             .then(response => response.json() // Transforma payload em json
                 .then(data => {
                     if (data.error != "0") {
@@ -31,7 +31,7 @@ $(document).ready(async function () {
                         //document.getElementById('status-image').src = "assets/Xcinza.png";
                         //document.getElementById("status-text").innerHTML = ("Erro de " + data.error);
                     } else {
-                        fetch("http://10.128.65.52:1234/last_readings")
+                        fetch("https://greener-g6it.onrender.com/last_readings")
                             .then(response => response.json() // Transforma payload em json
                                 .then(data => giveFeedback(data[0].temperature))) // Passa json para a função de atualizar cards de estufas
                     }
@@ -177,7 +177,7 @@ $(document).ready(async function () {
         let start = moment().subtract(10, "minutes") // Começa dez minutos antes do momento atual
         let end = moment() // Termina no momento atual
         // GET com filtro por data de início, data de fim e estufa
-        fetch("http://10.128.65.52:1234/filtered_readings?" + new URLSearchParams({
+        fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
             datetime_start: start.format(),
             datetime_end: end.format(),
             greenhouse: 1
@@ -225,7 +225,7 @@ $(document).ready(async function () {
         // Segue a mesma lógica da função anterior
         let start = moment().subtract(1, "hours")
         let end = moment()
-        fetch("http://10.128.65.52:1234/filtered_readings?" + new URLSearchParams({
+        fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
             datetime_start: start.format(),
             datetime_end: end.format(),
             greenhouse: 1
@@ -271,7 +271,7 @@ $(document).ready(async function () {
         // Segue a mesma lógica da função anterior
         let start = moment().subtract(1, "day")
         let end = moment()
-        fetch("http://10.128.65.52:1234/filtered_readings?" + new URLSearchParams({
+        fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
             datetime_start: start.format(),
             datetime_end: end.format(),
             greenhouse: 1
@@ -314,7 +314,7 @@ $(document).ready(async function () {
     function getReadingsWeek() {
         let start = moment().subtract(1, "week")
         let end = moment()
-        fetch("http://10.128.65.52:1234/filtered_readings?" + new URLSearchParams({
+        fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
             datetime_start: start.format(),
             datetime_end: end.format(),
             greenhouse: 1
@@ -359,7 +359,7 @@ $(document).ready(async function () {
         let start = moment().subtract(1, "month")
         let end = moment()
         console.log({ start, end })
-        fetch("http://10.128.65.52:1234/filtered_readings?" + new URLSearchParams({
+        fetch("https://greener-g6it.onrender.com/filtered_readings?" + new URLSearchParams({
             datetime_start: start.format(),
             datetime_end: end.format(),
             greenhouse: 1

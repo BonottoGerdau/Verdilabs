@@ -6,7 +6,7 @@ $('#salvar').on('click', function() {
         humidityMax: Number.parseFloat($("#humidityMax").val()),
     }
     console.log(json)
-    fetch("http://10.128.65.52:1234/insert_parameters", {
+    fetch("https://greener-g6it.onrender.com/insert_parameters", {
         method: "POST",
         body: JSON.stringify(json),
         headers: {"Content-type": "application/json; charset=UTF-8"}
