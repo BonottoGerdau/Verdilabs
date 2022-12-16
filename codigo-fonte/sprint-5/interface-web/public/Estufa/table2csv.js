@@ -1,3 +1,6 @@
+/* Módulo obtido do GitHub (https://github.com/rubo77/table2CSV) para transformar tabelas
+HTML em CSV. Não foi comentado porque o código não é nosso; é apenas uma biblioteca de Javascript */
+
 jQuery.fn.table2CSV = function(options) {
     var options = jQuery.extend({
         separator: ',',

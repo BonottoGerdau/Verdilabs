@@ -4,13 +4,17 @@ de Greener de acordo com os dados recebidos do ESP e sua adequação às regras 
 Este script prioriza a pior medida, ou seja, caso apenas um dos indicadores esteja fora
 do intervalo permitido, a interface ficará vermelha e sinalizará urgência mesmo assim, 
 independentemente de o outro indicador estar normal.
+*/
 
-Este script também atende apenas a estufa 1 no momento. Suas funções serão generalizadas
-para os outros cards e medidas nas próximas sprints. */
-
-
+// Quando a página carrega...
 $(document).ready(async function () {
-    let tempMin, tempMax, humidityMin, humidityMax;
+
+    let tempMin, tempMax, humidityMin, humidityMax; // Variáveis para guardar parâmetros de tolerância
+
+    // Faz quatro fetches para pegar cada um dos parâmetros e salvá-los nas variáveis correspondentes.
+    // O await é utilizado para que o código não continue até esses valores serem obtidos, evitando
+    // erros de "undefined"
+
     await fetch("https://greener-g6it.onrender.com/tempMin").then(response => response.json()
     .then(data => {
         tempMin = Number.parseInt(data);
@@ -30,8 +34,6 @@ $(document).ready(async function () {
     .then(data => {
         humidityMax = Number.parseInt(data);
     }))
-
-    console.log({tempMin, tempMax, humidityMin, humidityMax})
 
     // Variáveis que guardam estado do sistema, isto é, 
     // se é necessário mostrar mensagens de alerta e/ou urgência
@@ -53,21 +55,20 @@ $(document).ready(async function () {
         }, 1000);
     })
 
-    // Faz uma requisição GET para as últimas leituras recebidas do ESP pelo servidor
+    // Faz uma requisição GET para os últimos erros identificados
     const getReadings = function () {
         fetch("https://greener-g6it.onrender.com/error")
             .then(response => response.json() // Transforma payload em json
                 .then(data => {
-                    if (data.error != "0") {
-                        console.log(data.error)
-                        document.getElementById('status-image').src = "assets/Xcinza.png"; 
-                        document.getElementById("status-text").innerHTML = ("Erro de " + data.error);
-                    } else {
+                    if (data.error != "0") { // Se tiver erro...
+                        document.getElementById('status-image').src = "assets/Xcinza.png"; // Troca ícone por ícone de erro
+                        document.getElementById("status-text").innerHTML = ("Erro de " + data.error); // Troca status pelo nome do erro
+                    } else { // Se não tiver, faz o fetch normalmente para pegar as últimas medições
                         fetch("https://greener-g6it.onrender.com/last_readings")
                             .then(response => response.json() // Transforma payload em json
                                 .then(data => updateCards(data))) // Passa json para a função de atualizar cards de estufas
                     }
-                })) // Passa json para a função de atualizar cards de estufas
+                }))
     }
 
     // Checa medida de temperatura e exibe legenda correspondente, se necessário, 

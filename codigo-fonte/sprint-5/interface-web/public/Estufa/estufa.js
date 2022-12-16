@@ -1,3 +1,6 @@
+/* JS para tela de estufa específica */
+
+
 $(document).ready(async function () {
     let tempMin, tempMax, humidityMin, humidityMax;
     await fetch("https://greener-g6it.onrender.com/tempMin").then(response => response.json()

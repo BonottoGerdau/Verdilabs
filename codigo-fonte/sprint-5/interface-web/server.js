@@ -1,6 +1,6 @@
 
 // CÓDIGO DO SERVIDOR DE GREENER: serve interface gráfica, recebe informações do ESP-32 e salva
-// no banco de dados, exibe histórico na interface
+// no banco de dados
 
 // importa bibliotecas necessárias para criar servidor (express) e se comunicar com database (sqlite3)
 const express = require('express');
@@ -36,7 +36,9 @@ const DBPATH = 'db.db'
 
 // salva últimas leituras recebidas do ESP-32
 let currentReadings = [0, 0, 0, 0]
+// salva parâmetros recebidos do frontend para o ESP-32
 let parameters = [0, 0, 0, 0]
+// salva estado de erro atual
 let error = "0"
 
 /* DEFINIÇÃO DOS ENDPOINTS */
@@ -60,8 +62,9 @@ app.get('/all_readings', (req, res) => {
     db.close(); // Fecha banco
 });
 
+// Devolve todas as medições para uma certa estufa
 app.get('/greenhouse_readings', (req, res) => {
-    const { greenhouse } = req.query;
+    const { greenhouse } = req.query; // pega número da estufa
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -84,12 +87,10 @@ app.get('/filtered_readings', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
-    console.log(req.query)
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
     const { datetime_start, datetime_end, greenhouse } = req.query; // Desmembra query em constantes
-    console.log(moment(datetime_end).format())
-    var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + moment(datetime_start).format() + '" AND "' +
+    var sql = 'SELECT * FROM sensor WHERE (datetime BETWEEN "' + moment().format() + '" AND "' +
         moment(datetime_end).format() + '") AND greenhouse == ' + Number.parseInt(greenhouse); // Filtra por data e estufa
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -100,13 +101,14 @@ app.get('/filtered_readings', (req, res) => {
     db.close();
 });
 
+// retorna temperatura mínima atual
 app.get('/tempMin', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Pega última linha adicionada
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
@@ -116,13 +118,14 @@ app.get('/tempMin', (req, res) => {
     db.close();
 });
 
+// retorna temperatura máxima atual
 app.get('/tempMax', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Retorna linha mais recente da tabela
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
@@ -132,13 +135,14 @@ app.get('/tempMax', (req, res) => {
     db.close();
 });
 
+// Retorna umidade mínima atual
 app.get('/humidityMin', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Retorna linha mais recente da tabela
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
@@ -148,13 +152,14 @@ app.get('/humidityMin', (req, res) => {
     db.close();
 });
 
+// Retorna umidade máxima atual
 app.get('/humidityMax', (req, res) => {
     // Define header e status de sucesso
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
     // Inicia comunicação com database
     const db = new sqlite3.Database(DBPATH);
-    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Filtra por data e estufa
+    var sql = 'SELECT * FROM parameter ORDER BY id DESC LIMIT 1'; // Retorna linha mais recente da tabela
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
@@ -164,6 +169,7 @@ app.get('/humidityMax', (req, res) => {
     db.close();
 });
 
+// Endpoint para inserir novos parâmetros
 app.post('/insert_parameters', (req, res) => {
     res.statusCode = 200;
     const db = new sqlite3.Database(DBPATH);
@@ -212,19 +218,19 @@ app.post('/insert_reading', urlencodedParser, (req, res) => {
     res.end()
 });
 
+// Endpoint para inserir erro do sistema
 app.post('/insert_error', urlencodedParser, (req, res) => {
     console.log(req.body)
     res.statusCode = 200;
-    error = req.body // Salva dados da requisição em uma variável
-    error.datetime = moment()
-    // Cria comando SQL para inserir campos do body no banco de dados
+    error = req.body // Salva erro atual em uma variável global
+    error.datetime = moment() // Salva hora do erro
     res.end()
 });
 
+// Retorna último erro
 app.get('/error', urlencodedParser, (req, res) => {
     res.statusCode = 200;
     res.setHeader('Access-Control-Allow-Origin', '*');
-    // Cria comando SQL para inserir campos do body no banco de dados
     res.json(error)
 });
 
