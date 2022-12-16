@@ -11,6 +11,9 @@ Projeto 5
 ## Grupo: Verdilabs
 
 ## Solução: Greener
+Greener é um sistema de internet das coisas que busca automatizar o monitoramento da temperatura e umidade das casas de vegetação através de sensores e um microcontrolador conectado à internet, armazenando os dados coletados em um servidor em nuvem utilizada pela Gerdau Florestal para gerir seus processos. 
+Objetivando ainda a otimização de tempo e recursos humanos, a aplicação interpreta os valores adquiridos e sugerir as medidas adequadas para a manutenção do viveiro, como a abertura de janelas laterais em certo número de graus. Pretende-se, com isso, obter dados mais granulares para análise futura do crescimento das mudas e das condições da estufa, além de notificações e alertas para intervenções urgentes na estufa.
+
 
 ## Integrantes:
 - <a href="https://www.linkedin.com/in/daniel-barzilai-061036234/"> Daniel Barzilai</a>
@@ -22,4 +25,4 @@ Projeto 5
 
 
 ## 📋 Licença/License
-<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/Spidus/Teste_Final_1">MODELO GIT INTELI</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="#">Inteli, Antonio Nassar, João Moarques, Maria Luísa Maia, Marcos Moura, Priscila Falcão, Thomas Barton, Vitor Oliveira</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
+<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/Spidus/Teste_Final_1">MODELO GIT INTELI</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="#">Inteli, is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
