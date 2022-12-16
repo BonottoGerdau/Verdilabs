@@ -3,7 +3,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <string>
-#include "displaySymbols.h"
 
 // Define pinos I2C do circuito. 
 // Nas próximas sprints, pretendemos centralizar a definição desses pinos no código-fonte principal,
@@ -22,7 +21,6 @@ LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);
 void setupDisplay() {
   // Inicializa o I2C
   Wire.begin(SDA_PIN, SLC_PIN);
-  Serial.print(test);
   // Inicializa o objeto de LCD
   lcd.init();
   // Liga o backlight do LCD

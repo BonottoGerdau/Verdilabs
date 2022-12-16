@@ -1,98 +1,87 @@
-#include <WiFi.h>                                                        // Biblioteca básica para trabalhar com WiFi no ESP
-#include <HTTPClient.h>                                                  // Biblioteca para fazer requisições HTTP
-#include <Arduino_JSON.h>
+/* Módulo para requisitar parâmetros do servidor */
+#include <WiFi.h>        // Biblioteca básica para trabalhar com WiFi no ESP
+#include <HTTPClient.h>  // Biblioteca para fazer requisições HTTP
 
-const char* tempMinAddress = "http://10.128.65.52:1234/tempMin";  
-const char* tempMaxAddress = "http://10.128.65.52:1234/tempMax";  
-const char* humidityMinAddress = "http://10.128.65.52:1234/humidityMin";  
-const char* humidityMaxAddress = "http://10.128.65.52:1234/humidityMax";  
+// Definições dos endpoints para cada parâmetro
+const char* tempMinAddress = "https://greener-g6it.onrender.com/tempMin";
+const char* tempMaxAddress = "https://greener-g6it.onrender.com/tempMax";
+const char* humidityMinAddress = "https://greener-g6it.onrender.com/humidityMin";
+const char* humidityMaxAddress = "https://greener-g6it.onrender.com/humidityMax";
 
+// Esta função faz a requisição dos parâmetros para cada um dos endpoints, totalizando quatro requests HTTP separadas, e os salva num array 
+// passado como argumento
 void requestParameters(double* parameters) {
-  HTTPClient http;
+  HTTPClient http;  // Cria cliente HTTP
 
-  // Your IP address with path or Domain name with URL path 
+  // Inicia requisição para o endpoint desejado
   http.begin(tempMinAddress);
 
-
-  // Send HTTP POST request
+  // Envia HTTP POST
   int httpResponseCode = http.sendRequest("GET");
 
-  String payload = "{}";   
+  // Cria variável para salvar dados retornados da requisição
+  String payload = "{}";
 
-  if (httpResponseCode>0) {
-    Serial.print("HTTP Response code: ");
+  // Se a requisição funcionar (código > 0)...
+  if (httpResponseCode > 0) {
+    Serial.print("HTTP Response code: "); // Printa código
     Serial.println(httpResponseCode);
-    payload = http.getString();
-    parameters[0] = payload.toDouble();
-    Serial.println(parameters[0]);
-  }
-  else {
-    Serial.print("Error code: ");
+    payload = http.getString(); // Pega retorno
+    parameters[0] = payload.toDouble(); // Guarda retorno como double no array
+  } else {
+    Serial.print("Error code: "); // Printa erro, se houver
     Serial.println(httpResponseCode);
   }
-  // Free resources
+  // Finaliza requisição
   http.end();
+
+  // Inicia próxima requisição. A mesma lógica explicada acima se aplica às próximas requisições.
   http.begin(tempMaxAddress);
 
-
-  // Send HTTP POST request
   httpResponseCode = http.sendRequest("GET");
 
-  payload = "{}";   
+  payload = "{}";
 
-  if (httpResponseCode>0) {
+  if (httpResponseCode > 0) {
     Serial.print("HTTP Response code: ");
     Serial.println(httpResponseCode);
     payload = http.getString();
     parameters[1] = payload.toDouble();
-    Serial.println(parameters[1]);
-  }
-  else {
+  } else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
-  // Free resources
   http.end();
+
   http.begin(humidityMinAddress);
-
-
-  // Send HTTP POST request
   httpResponseCode = http.sendRequest("GET");
 
-  payload = "{}";   
+  payload = "{}";
 
-  if (httpResponseCode>0) {
+  if (httpResponseCode > 0) {
     Serial.print("HTTP Response code: ");
     Serial.println(httpResponseCode);
     payload = http.getString();
     parameters[2] = payload.toDouble();
-    Serial.println(parameters[2]);
-  }
-  else {
+  } else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
-  // Free resources
   http.end();
+
   http.begin(humidityMaxAddress);
-
-
-  // Send HTTP POST request
   httpResponseCode = http.sendRequest("GET");
 
-  payload = "{}";   
+  payload = "{}";
 
-  if (httpResponseCode>0) {
+  if (httpResponseCode > 0) {
     Serial.print("HTTP Response code: ");
     Serial.println(httpResponseCode);
     payload = http.getString();
     parameters[3] = payload.toDouble();
-    Serial.println(parameters[3]);
-  }
-  else {
+  } else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
-  // Free resources
   http.end();
 }

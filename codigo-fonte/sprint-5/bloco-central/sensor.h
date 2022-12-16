@@ -21,6 +21,7 @@ float getHumidity() {
   return humidity.relative_humidity;  // Retorna valor da umidade
 }
 
+// Retorna temperatura medida pelo sensor
 float getTemp() {
   sensors_event_t humidity, temp;  // Cria objetos de temperatura e umidade
   aht.getEvent(&humidity, &temp);  // Atualiza valor das medições

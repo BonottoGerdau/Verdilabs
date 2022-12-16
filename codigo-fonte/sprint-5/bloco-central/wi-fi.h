@@ -1,9 +1,10 @@
+/* Módulo para enviar requisições de medições e erros */
 #include <WiFi.h>                                                        // Biblioteca básica para trabalhar com WiFi no ESP
 #include <HTTPClient.h>                                                  // Biblioteca para fazer requisições HTTP
 #include <Arduino_JSON.h>
 
-const char* readingAddress = "http://10.128.65.52:1234/insert_reading";  // Guarda endereço do endpoint para enviar dados
-const char* errorAddress = "http://10.128.65.52:1234/insert_error";      // Guarda endereço do endpoint para enviar dados
+const char* readingAddress = "https://greener-g6it.onrender.com/insert_reading";  // Guarda endereço do endpoint para enviar dados de leitura
+const char* errorAddress = "https://greener-g6it.onrender.com/insert_error";      // Guarda endereço do endpoint para enviar dados de erro
 
 // Esta função envia dados de temperatura, umidade e estufa de origem para o servidor externo
 void sendReading(float temperature, float humidity, int greenhouse) {
@@ -45,6 +46,7 @@ bool getWiFiStatus() {
   return 0;
 }
 
+// Envia erro de sensor ao servidor
 void sendSensorError() {
   // Checa status da conexão Wi-Fi. Se ela estiver ativa, realiza a requisição
   if (WiFi.status() == WL_CONNECTED) {
@@ -77,7 +79,7 @@ void sendSensorError() {
   }
 }
 
-
+// Informa o servidor que nenhum erro foi detectado ("0")
 void sendNoError() {
   // Checa status da conexão Wi-Fi. Se ela estiver ativa, realiza a requisição
   if (WiFi.status() == WL_CONNECTED) {
