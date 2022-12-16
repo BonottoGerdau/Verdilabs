@@ -55,7 +55,7 @@ $(document).ready(async function () {
         }, 1000);
     })
 
-    // Faz uma requisição GET para os últimos erros identificados
+    // Faz uma requisição GET para os últimos erros identificados e para a últimas leituras
     const getReadings = function () {
         fetch("https://greener-g6it.onrender.com/error")
             .then(response => response.json() // Transforma payload em json

@@ -1,8 +1,13 @@
 /* JS para tela de estufa específica */
 
-
+// Quando a página carregar...
 $(document).ready(async function () {
-    let tempMin, tempMax, humidityMin, humidityMax;
+    let tempMin, tempMax, humidityMin, humidityMax; // Variáveis para guardar parâmetros de tolerância
+
+    // Faz quatro fetches para pegar cada um dos parâmetros e salvá-los nas variáveis correspondentes.
+    // O await é utilizado para que o código não continue até esses valores serem obtidos, evitando
+    // erros de "undefined"
+
     await fetch("https://greener-g6it.onrender.com/tempMin").then(response => response.json()
         .then(data => {
             tempMin = Number.parseInt(data);
@@ -24,48 +29,46 @@ $(document).ready(async function () {
         }))
 
 
-
+    // Faz uma requisição GET para os últimos erros identificados e para a últimas leituras
     const getReadings = function () {
         fetch("https://greener-g6it.onrender.com/error")
             .then(response => response.json() // Transforma payload em json
                 .then(data => {
-                    if (data.error != "0") {
-                        console.log(data.error)
-                        //document.getElementById('status-image').src = "assets/Xcinza.png";
-                        //document.getElementById("status-text").innerHTML = ("Erro de " + data.error);
-                    } else {
+                    if (data.error != "0") { // Se tiver erro...
+                        $(`#status-text`).text("Erro de sensor") // Mostra erro no status
+                    } else { // Se não tiver erro...
                         fetch("https://greener-g6it.onrender.com/last_readings")
                             .then(response => response.json() // Transforma payload em json
-                                .then(data => giveFeedback(data[0].temperature))) // Passa json para a função de atualizar cards de estufas
+                                .then(data => giveFeedback(data[0].temperature))) // Passa temperatura para dar feedback
                     }
-                })) // Passa json para a função de atualizar cards de estufas
+                }))
     }
 
+    // Dá feedback da temperatura lida através do status, por conteúdo e cor do texto
     function giveFeedback(temp) {
         if (temp < tempMin * 0.95) { // checa condições
-            $(`#status-text`).css({"color": "rgb(203, 19, 19)", "font-size": "calc(1.3rem + .6vw)"}) // dá contorno vermelho ao card da estufa
-            $(`#status-text`).text("Fechar janelas") // dá contorno vermelho ao card da estufa
-        } else if (temp < tempMin) { // A lógica acima é aplicada para as outras faixas de medida, mudando o contorno e a legenda de acordo com a gravidade da situação
-            $(`#status-text`).css({"color": "rgb(215, 180, 6)", "font-size": "calc(1.3rem + .6vw)"}) // dá contorno vermelho ao card da estufa
-            $(`#status-text`).text("Atenção... Esfriando!") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).css({ "color": "rgb(203, 19, 19)", "font-size": "calc(1.3rem + .6vw)" }) // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Fechar janelas") // muda texto
+        } else if (temp < tempMin) { // A lógica acima é aplicada para as outras faixas de medida, mudando o texto e a cor de acordo com a gravidade da situação
+            $(`#status-text`).css({ "color": "rgb(215, 180, 6)", "font-size": "calc(1.3rem + .6vw)" })
+            $(`#status-text`).text("Atenção... Esfriando!")
         } else if (temp > tempMax * 1.1) {
-            $(`#status-text`).text("Abra todas\nas janelas") // dá contorno vermelho ao card da estufa
-            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Abra todas\nas janelas")
+            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)")
         } else if (temp > tempMax * 1.05) {
-            $(`#status-text`).text("Abra 100%\ndas laterais") // dá contorno vermelho ao card da estufa
-            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Abra 100%\ndas laterais")
+            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)")
         } else if (temp > tempMax * 1.03) {
-            $(`#status-text`).text("Abra 50%\ndas laterais") // dá contorno vermelho ao card da estufa
-            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Abra 50%\ndas laterais")
+            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)")
         } else if (temp > tempMax) {
-            $(`#status-text`).text("Abra 25%\ndas laterais") // dá contorno vermelho ao card da estufa
-            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Abra 25%\ndas laterais")
+            $(`#status-text`).css("color", "rgba(203, 19, 19, 0.5)")
         } else {
-            $(`#status-text`).text("Tudo certo!") // dá contorno vermelho ao card da estufa
-            $(`#status-text`).css("color", "rgb(86,144,103)") // dá contorno vermelho ao card da estufa
+            $(`#status-text`).text("Tudo certo!")
+            $(`#status-text`).css("color", "rgb(86,144,103)")
         }
     }
-
     // Variáveis para guardar dados recebidos nos endpoints
     let dates = [] // Guarda datas
     let humidity_dataset = []; // Guarda valores de umidade
@@ -401,28 +404,28 @@ $(document).ready(async function () {
                     $("tbody").html(tableRows);
                 }));
     }
+    
+    // Função que adiciona botão de fazer download dos dados e chama biblioteca necessária
+    $('table').each(function () {
+        var $table = $(this); // Acessa tabela no HTML
 
-    $(document).ready(function () {
-        $('table').each(function () {
-            var $table = $(this);
-    
-            var $button = $("<button type='button'>");
-            $button.text("Baixar dados");
-            $button.insertAfter($table);
-    
-            $button.click(function () {
-                var csv = $table.table2CSV({
-                    delivery: 'value'
-                });
-                window.location.href = 'data:text/csv;charset=UTF-8,' 
-                + encodeURIComponent(csv);
+        // Cria e adiciona botão
+        var $button = $("<button type='button'>");
+        $button.text("Baixar dados");
+        $button.insertAfter($table);
+
+        // Chama biblioteca no clique
+        $button.click(function () {
+            var csv = $table.table2CSV({
+                delivery: 'value'
             });
+            window.location.href = 'data:text/csv;charset=UTF-8,'
+                + encodeURIComponent(csv);
         });
-    })
+    });
+
     // Recebe leituras assim que a página carrega
     getReadings()
     // Atualiza leituras a cada 10 segundos
     setInterval(getReadings, 10000)
-
-    
 });
