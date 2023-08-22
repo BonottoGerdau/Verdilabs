@@ -3,12 +3,13 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 #include <string>
+#include "displaySymbols.h"
 
 // Define pinos I2C do circuito. 
 // Nas próximas sprints, pretendemos centralizar a definição desses pinos no código-fonte principal,
 // para minimizar erros de pino
-#define SDA_PIN 4
-#define SLC_PIN 5
+#define SDA_PIN 5
+#define SLC_PIN 4
 
 // Define dimensões do LCD
 int lcdColumns = 16;
@@ -40,6 +41,10 @@ void welcome() {
   
   // Espera 5 segundos
   delay(5000);
+  lcd.createChar(1, thermometerSymbol);
+  lcd.createChar(2, humiditySymbol);
+  lcd.createChar(3, wifiSymbol);
+  delay(5000); 
   // Limpa LCD
   lcd.clear();
 }
