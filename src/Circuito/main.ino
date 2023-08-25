@@ -89,8 +89,8 @@ void loop() {
 void connectWiFi() {
   WiFi.mode(WIFI_STA);  // Define Wi-Fi como Station Mode, permitindo a conexão com uma rede estabelecida a partir de um ponto de acesso
 
-  const char* ssid     = "Inteli-welcome";         // The SSID (name) of the Wi-Fi network you want to connect to
-  const char* password = "";  
+  const char* ssid     = "WB HOME 2G";         // The SSID (name) of the Wi-Fi network you want to connect to
+  const char* password = "C6624WB4084";
   displayMessage("Conecte-se a", "rede Greener");
 
   // Este método condição inicia um blocking loop para 1. iniciar um hotspot; 2. conectar-se automaticamente com a rede local, se as credenciais estiverem
